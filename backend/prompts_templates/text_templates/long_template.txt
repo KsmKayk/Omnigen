@@ -1,0 +1,21 @@
+Crie um roteiro detalhado para um vídeo longo (10 a 12 minutos) sobre: {{title}}.
+
+O tema principal é: {{theme}}.
+
+O roteiro deve:
+- Ter duração aproximada de 10-12 minutos quando narrado
+- Ter uma introdução forte que prende a atenção
+- Ser dividido em seções claras com aproximadamente 25 a 30 cenas visuais
+- Ter desenvolvimento lógico e coerente
+- Ter uma conclusão marcante
+- Ser em português do Brasil
+- Estar formatado com indicações de cena separadas por linhas
+
+Formato esperado:
+[CENA 1] Descrição da cena
+Narrativa da cena...
+
+[CENA 2] Descrição da cena
+Narrativa da cena...
+
+(Por favor, continue este formato para todas as cenas, cobrindo todo o tempo de 10-12 minutos)

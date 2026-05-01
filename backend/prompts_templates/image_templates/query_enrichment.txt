@@ -1,0 +1,2 @@
+# Image search query enrichment for theme: {{theme}}
+# Keywords to search for:

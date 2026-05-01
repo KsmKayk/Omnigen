@@ -1,0 +1,4 @@
+# Piper TTS Configuration
+# Model: pt_BR-faber-medium.onnx
+# Voice: Portuguese (Brazil)
+# Speed: 1.0

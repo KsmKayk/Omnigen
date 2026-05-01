@@ -1,0 +1,11 @@
+Gere 10 tags (palavras-chave) relevantes para um vídeo com o seguinte roteiro:
+
+{{script}}
+
+As tags devem:
+- Ser relevantes para o conteúdo
+- Incluir palavras populares de busca
+- Estar em português do Brasil
+- Ser separadas por vírgula
+
+Retorne apenas as tags, nada mais.

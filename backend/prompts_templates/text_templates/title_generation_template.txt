@@ -1,0 +1,11 @@
+Gere 3 sugestões de títulos criativos e atraentes para um vídeo sobre o tema: {{theme}}.
+
+O vídeo é do tipo: {{video_type}}.
+
+Os títulos devem:
+- Ser curtos e impactantes
+- Despertar curiosidade
+- Ser adequados para o público geral
+- Estar em português do Brasil
+
+Retorne apenas os 3 títulos, um por linha, sem numeração ou formatação extra.

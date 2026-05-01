@@ -1,0 +1,12 @@
+Crie uma descrição atraente e SEO-friendly para um vídeo com o seguinte roteiro:
+
+{{script}}
+
+A descrição deve:
+- Ter entre 2 e 4 frases
+- Despertar interesse no espectador
+- Incluir palavras-chave naturalmente
+- Ser em português do Brasil
+- Não exceder 200 caracteres
+
+Retorne apenas a descrição, nada mais.
