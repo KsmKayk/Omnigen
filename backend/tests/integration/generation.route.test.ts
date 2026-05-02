@@ -103,4 +103,41 @@ describe('POST /api/generation/:id/select-title', () => {
 
     expect(res.status).toBe(404)
   })
+
+  it('returns selected title on valid request', async () => {
+    mockGenerateTitles.mockResolvedValueOnce(['Title A', 'Title B', 'Title C'])
+    const app = createApp()
+
+    const startRes = await request(app)
+      .post('/api/generation/start')
+      .send({ theme: 'Zeus', videoType: 'short' })
+
+    const { generationId } = startRes.body
+
+    const res = await request(app)
+      .post(`/api/generation/${generationId}/select-title`)
+      .send({ titleIndex: 1 })
+
+    expect(res.status).toBe(200)
+    expect(res.body.selectedTitle).toBe('Title B')
+  })
+
+  it('returns 400 for invalid titleIndex', async () => {
+    const app = createApp()
+    const res = await request(app)
+      .post('/api/generation/some-id/select-title')
+      .send({ titleIndex: 5 })
+
+    expect(res.status).toBe(400)
+  })
+})
+
+describe('GET /api/generation/:id/stream', () => {
+  it('returns 404 for non-existent generation stream', async () => {
+    const app = createApp()
+    const res = await request(app)
+      .get('/api/generation/nonexistent-id/stream')
+
+    expect(res.status).toBe(404)
+  })
 })

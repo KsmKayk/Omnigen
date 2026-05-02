@@ -7,7 +7,8 @@ import { desc } from 'drizzle-orm'
 export const logsRouter = Router()
 
 logsRouter.get('/', async (req: Request, res: Response) => {
-  const limit = Math.min(Number(req.query.limit ?? 100), 500)
+  const rawLimit = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit
+  const limit = Math.min(Number(rawLimit ?? 100) || 100, 500)
   const records = await getDb().select().from(logs).orderBy(desc(logs.createdAt)).limit(limit)
   return res.json(records)
 })

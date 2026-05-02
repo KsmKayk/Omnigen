@@ -60,26 +60,31 @@ generationRouter.post('/:id/select-title', async (req: Request, res: Response) =
     return res.status(400).json({ error: parsed.error.flatten().fieldErrors })
   }
 
-  const db = getDb()
-  const rows = await db.select().from(generations).where(eq(generations.id, id)).limit(1)
-  const generation = rows[0]
+  try {
+    const db = getDb()
+    const rows = await db.select().from(generations).where(eq(generations.id, id)).limit(1)
+    const generation = rows[0]
 
-  if (!generation) {
-    return res.status(404).json({ error: 'Generation not found' })
+    if (!generation) {
+      return res.status(404).json({ error: 'Generation not found' })
+    }
+
+    const titles: string[] = JSON.parse(generation.suggestedTitles ?? '[]')
+    const selectedTitle = titles[parsed.data.titleIndex]
+
+    if (!selectedTitle) {
+      return res.status(400).json({ error: 'Invalid title index' })
+    }
+
+    await db.update(generations)
+      .set({ selectedTitle, status: 'processing', updatedAt: Date.now() })
+      .where(eq(generations.id, id))
+
+    return res.json({ generationId: id, selectedTitle })
+  } catch (err) {
+    logger.error({ err }, 'failed to select title')
+    return res.status(500).json({ error: (err as Error).message })
   }
-
-  const titles: string[] = JSON.parse(generation.suggestedTitles ?? '[]')
-  const selectedTitle = titles[parsed.data.titleIndex]
-
-  if (!selectedTitle) {
-    return res.status(400).json({ error: 'Invalid title index' })
-  }
-
-  await db.update(generations)
-    .set({ selectedTitle, status: 'processing', updatedAt: Date.now() })
-    .where(eq(generations.id, id))
-
-  return res.json({ generationId: id, selectedTitle })
 })
 
 generationRouter.get('/:id/stream', async (req: Request, res: Response) => {
