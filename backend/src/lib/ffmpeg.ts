@@ -10,36 +10,30 @@ function getFfmpegPath(): string {
 }
 
 export async function getAudioDurationMs(wavPath: string): Promise<number> {
-  const ffprobePath = getFfmpegPath().replace('ffmpeg', 'ffprobe')
-
   return new Promise((resolve, reject) => {
+    const ffprobePath = getFfmpegPath().replace(/ffmpeg(\.exe)?$/i, (_, ext) => `ffprobe${ext ?? ''}`)
+
     execFile(
       ffprobePath,
       ['-v', 'error', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', wavPath],
-      (_err, stdout, stderr) => {
-        const source = stdout.trim() || stderr
-        const match = source.match(/Duration:\s*(\d+):(\d+):(\d+)\.(\d+)/) ||
-          stdout.match(/^(\d+\.\d+)/)
-
-        if (!match) {
-          const float = parseFloat(stdout.trim())
-          if (!isNaN(float)) {
-            resolve(Math.round(float * 1000))
-            return
-          }
-          reject(new Error(`Could not parse duration from: ${source}`))
+      (err, stdout, stderr) => {
+        const floatMs = parseFloat(stdout.trim())
+        if (!isNaN(floatMs)) {
+          resolve(Math.round(floatMs * 1000))
           return
         }
 
-        if (match.length >= 5) {
-          const h = parseInt(match[1])
-          const m = parseInt(match[2])
-          const s = parseInt(match[3])
-          const cs = parseInt(match[4].padEnd(3, '0').slice(0, 3))
+        const durationMatch = stderr.match(/Duration:\s*(\d+):(\d+):(\d+)\.(\d+)/)
+        if (durationMatch) {
+          const h = parseInt(durationMatch[1])
+          const m = parseInt(durationMatch[2])
+          const s = parseInt(durationMatch[3])
+          const cs = parseInt(durationMatch[4].padEnd(3, '0').slice(0, 3))
           resolve(h * 3_600_000 + m * 60_000 + s * 1_000 + cs)
-        } else {
-          resolve(Math.round(parseFloat(match[1]) * 1000))
+          return
         }
+
+        reject(err ?? new Error(`Could not parse duration from ffprobe output: "${stdout.trim() || stderr.trim()}"`))
       },
     )
   })

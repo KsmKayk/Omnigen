@@ -10,9 +10,9 @@ const mockExecFile = childProcess.execFile as jest.MockedFunction<typeof childPr
 describe('getAudioDurationMs', () => {
   it('parses ffprobe duration output', async () => {
     // ffprobe outputs duration to stderr
-    mockExecFile.mockImplementation((_cmd, _args, callback: any) => {
-      callback(null, '', 'Duration: 00:00:52.34, start: 0')
-      return {} as any
+    mockExecFile.mockImplementation((_cmd, _args, callback) => {
+      (callback as (err: Error | null, stdout: string, stderr: string) => void)(null, '52.34', '')
+      return {} as ReturnType<typeof childProcess.execFile>
     })
 
     const ms = await getAudioDurationMs('/tmp/narration.wav')
