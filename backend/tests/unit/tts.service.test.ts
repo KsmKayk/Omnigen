@@ -16,7 +16,7 @@ describe('synthesizeSpeech', () => {
     const result = await synthesizeSpeech(narrationText, 'gen1', '/tmp')
     expect(mockRunPiper).toHaveBeenCalledWith(
       narrationText,
-      expect.stringContaining('narration.wav'),
+      expect.stringContaining(path.join('gen1', 'narration.wav')),
     )
     expect(result).toContain('narration.wav')
   })

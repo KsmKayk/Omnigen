@@ -14,7 +14,6 @@ export async function runPiper(text: string, outputPath: string): Promise<string
     modelPath,
     '-f',
     outputPath,
-    '--',
     text,
   ])
 
