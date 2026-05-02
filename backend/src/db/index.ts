@@ -30,3 +30,6 @@ export function getDb(): BetterSQLite3Database<typeof schema> {
 
 // Convenience proxy - used after initDb is called
 export { schema }
+
+// Re-export runMigrations for use in startup
+export { runMigrations } from './migrate'
