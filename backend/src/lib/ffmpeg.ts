@@ -56,6 +56,7 @@ export async function extractFrame(
     '-i', videoPath,
     '-frames:v', '1',
     '-q:v', '2',
+    '-pix_fmt', 'yuvj420p',
     '-y',
     outputPath,
   ])
