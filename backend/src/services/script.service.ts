@@ -9,6 +9,10 @@ function getTemplatePath(videoType: VideoType): string {
   return path.join(config.PROMPTS_PATH, 'text_templates', file)
 }
 
+function cleanNarration(text: string): string {
+  return text.replace(/^(narrator|narrador)\s*:\s*/i, '').trim()
+}
+
 function parseScenes(raw: string): SceneBlock[] {
   const scenes: SceneBlock[] = []
   // Match [CENA N] Description\nNarration text
@@ -24,7 +28,7 @@ function parseScenes(raw: string): SceneBlock[] {
         scenes.push({
           sceneId: currentScene.sceneId,
           description: currentScene.description ?? '',
-          narration: narrationLines.join('\n').trim(),
+          narration: cleanNarration(narrationLines.join('\n').trim()),
         })
         narrationLines.length = 0
       }

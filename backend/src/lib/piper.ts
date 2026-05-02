@@ -1,21 +1,22 @@
-import { execFile } from 'child_process'
-import { promisify } from 'util'
+import { spawn } from 'child_process'
 import { config } from '../config'
-
-const execFileAsync = promisify(execFile)
 
 export async function runPiper(text: string, outputPath: string): Promise<string> {
   const modelPath = config.PIPER_MODEL_PATH
 
-  await execFileAsync('python', [
-    '-m',
-    'piper',
-    '-m',
-    modelPath,
-    '-f',
-    outputPath,
-    text,
-  ])
+  return new Promise((resolve, reject) => {
+    const proc = spawn('python', ['-m', 'piper', '-m', modelPath, '-f', outputPath])
+    let stderr = ''
 
-  return outputPath
+    proc.stderr.on('data', (chunk: Buffer) => { stderr += chunk.toString() })
+    proc.stdin.on('error', reject)
+    proc.on('error', reject)
+    proc.on('close', (code) => {
+      if (code === 0) resolve(outputPath)
+      else reject(new Error(`piper exited with code ${code}: ${stderr.slice(0, 500)}`))
+    })
+
+    proc.stdin.write(text)
+    proc.stdin.end()
+  })
 }
