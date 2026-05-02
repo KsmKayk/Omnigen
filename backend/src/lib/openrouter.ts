@@ -21,7 +21,7 @@ export async function callLLM(prompt: string, systemPrompt?: string): Promise<st
     temperature: 0.7,
   })
 
-  const content = response.choices[0]?.message?.content
+  const content = response.choices?.[0]?.message?.content
   if (!content) {
     throw new Error('LLM returned empty response')
   }

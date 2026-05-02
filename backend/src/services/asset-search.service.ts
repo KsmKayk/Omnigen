@@ -40,7 +40,7 @@ export async function searchImages(
     photos: { src: { original: string }; width: number; height: number }[]
   }>(`https://api.pexels.com/v1/search?${params}`)
 
-  const photo = data.photos[0]
+  const photo = data.photos?.[0]
   if (!photo) return null
 
   return { url: photo.src.original, width: photo.width, height: photo.height }
@@ -53,10 +53,10 @@ export async function searchVideos(query: string): Promise<AssetSearchResult | n
     videos: { video_files: { link: string; width: number; height: number }[] }[]
   }>(`https://api.pexels.com/videos/search?${params}`)
 
-  const video = data.videos[0]
+  const video = data.videos?.[0]
   if (!video) return null
 
-  const file = video.video_files[0]
+  const file = video.video_files?.[0]
   if (!file) return null
 
   return { url: file.link, width: file.width, height: file.height }
