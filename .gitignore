@@ -1,9 +1,18 @@
 .env
-node_modules
-dist
-coverage
+node_modules/
+dist/
+coverage/
 *.log
 .DS_Store
 
-storage/*
 .worktrees/
+.next/
+*.onnx
+backend/storage/output/
+backend/storage/temp/
+backend/storage/omnigen.db
+drizzle/
+.env.local
+.env.*.local
+*.tsbuildinfo
+.pnpm-debug.log*

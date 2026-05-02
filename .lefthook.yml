@@ -1,0 +1,15 @@
+pre-commit:
+  parallel: true
+  commands:
+    backend-test:
+      root: backend/
+      run: pnpm test --passWithNoTests
+    backend-typecheck:
+      root: backend/
+      run: pnpm typecheck
+    frontend-test:
+      root: frontend/
+      run: pnpm test --passWithNoTests
+    frontend-typecheck:
+      root: frontend/
+      run: pnpm typecheck
