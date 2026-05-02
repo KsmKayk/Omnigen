@@ -7,3 +7,9 @@ coverage
 
 storage/*
 .worktrees/
+
+*.next/
+backend/storage/output/
+backend/storage/temp/
+backend/storage/omnigen.db
+drizzle/
