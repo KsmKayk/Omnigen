@@ -1,5 +1,5 @@
 .env
-node_modules
+node_modules/
 dist
 coverage
 *.log
@@ -8,7 +8,8 @@ coverage
 storage/*
 .worktrees/
 
-*.next/
+.next/
+*.onnx
 backend/storage/output/
 backend/storage/temp/
 backend/storage/omnigen.db
