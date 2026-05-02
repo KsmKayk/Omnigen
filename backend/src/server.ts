@@ -36,7 +36,7 @@ export function createApp() {
 }
 
 if (require.main === module) {
-  runStartup(config.STORAGE_PATH)
+  runStartup(config.STORAGE_PATH, config.DATABASE_URL)
   const app = createApp()
   app.listen(config.PORT, () => {
     logger.info({ port: config.PORT }, 'server started')

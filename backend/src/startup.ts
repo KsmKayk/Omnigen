@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import { runMigrations } from './db'
+import { initDb, runMigrations } from './db'
 import { logger } from './lib/logger'
 
 export function prepareStorageDirs(storagePath: string): void {
@@ -13,8 +13,9 @@ export function prepareStorageDirs(storagePath: string): void {
   }
 }
 
-export function runStartup(storagePath: string): void {
+export function runStartup(storagePath: string, databaseUrl: string): void {
   logger.info('running startup checks')
+  initDb(databaseUrl)
   runMigrations()
   logger.info('database migrations applied')
   prepareStorageDirs(storagePath)
