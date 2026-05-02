@@ -2,7 +2,7 @@ import path from 'path'
 import { generateScript } from './script.service'
 import { searchImages, searchVideos } from './asset-search.service'
 import { downloadAsset, ensureDir } from './asset-download.service'
-import { buildNarrationText, synthesizeSpeech } from './tts.service'
+import { synthesizeSpeech } from './tts.service'
 import { generateSubtitles } from './subtitle.service'
 import { renderVideo } from './render.service'
 import { generateThumbnails } from './thumbnail.service'
@@ -94,13 +94,12 @@ export async function runPipeline(input: PipelineInput): Promise<GenerationResul
     return records
   })
 
-  const ttsPath = await withEmit(emit, 'tts', 42, 55, 'Gerando narração...', () => {
-    const narrationText = buildNarrationText(scenes)
-    return synthesizeSpeech(narrationText, generationId, storagePath)
-  })
+  const { audioPath: ttsPath, durations } = await withEmit(emit, 'tts', 42, 55, 'Gerando narração...', () =>
+    synthesizeSpeech(scenes, generationId, storagePath),
+  )
 
   const subtitlePath = await withEmit(emit, 'subtitles', 55, 60, 'Gerando legendas...', () =>
-    generateSubtitles(scenes, generationId, storagePath, 50000),
+    generateSubtitles(scenes, durations, generationId, storagePath),
   )
 
   const videoPath = await withEmit(emit, 'render', 60, 80, 'Renderizando vídeo...', () =>

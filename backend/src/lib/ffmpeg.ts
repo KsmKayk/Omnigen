@@ -1,5 +1,6 @@
 import { execFile } from 'child_process'
 import { promisify } from 'util'
+import fs from 'fs'
 
 const execFileAsync = promisify(execFile)
 
@@ -44,6 +45,17 @@ export function buildConcatFile(imagePaths: string[], durationPerSceneMs: number
   return imagePaths
     .map((p) => `file '${p.replace(/\\/g, '/')}'\nduration ${durationSecs}`)
     .join('\n')
+}
+
+export async function concatenateAudioFiles(inputPaths: string[], outputPath: string): Promise<void> {
+  const listPath = outputPath + '.txt'
+  const content = inputPaths.map((p) => `file '${p.replace(/\\/g, '/')}'`).join('\n')
+  fs.writeFileSync(listPath, content, 'utf-8')
+  try {
+    await execFileAsync(getFfmpegPath(), ['-f', 'concat', '-safe', '0', '-i', listPath, '-y', outputPath])
+  } finally {
+    try { fs.unlinkSync(listPath) } catch { /* ignore */ }
+  }
 }
 
 export async function extractFrame(

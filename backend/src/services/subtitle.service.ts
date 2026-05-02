@@ -16,30 +16,19 @@ export function formatSRTTime(ms: number): string {
   ].join(':') + `,${String(millis).padStart(3, '0')}`
 }
 
-function countWords(text: string): number {
-  const trimmed = text.trim()
-  return trimmed === '' ? 0 : trimmed.split(/\s+/).length
-}
-
-function buildSRT(scenes: SceneBlock[], totalDurationMs: number): string {
-  const totalWords = scenes.reduce((sum, s) => sum + countWords(s.narration), 0)
+function buildSRT(scenes: SceneBlock[], durations: number[]): string {
   const blocks: string[] = []
-
   let cursor = 0
 
   for (let i = 0; i < scenes.length; i++) {
-    const scene = scenes[i]
-    const words = countWords(scene.narration)
-    const duration = Math.round((words / totalWords) * totalDurationMs)
     const start = cursor
-    // Snap the last block's end to totalDurationMs
-    const end = i === scenes.length - 1 ? totalDurationMs : cursor + duration
+    const end = cursor + durations[i]
 
     blocks.push(
       [
         String(i + 1),
         `${formatSRTTime(start)} --> ${formatSRTTime(end)}`,
-        scene.narration,
+        scenes[i].narration,
         '',
       ].join('\n'),
     )
@@ -52,14 +41,14 @@ function buildSRT(scenes: SceneBlock[], totalDurationMs: number): string {
 
 export async function generateSubtitles(
   scenes: SceneBlock[],
+  durations: number[],
   generationId: string,
   storagePath: string,
-  totalDurationMs: number,
 ): Promise<string> {
   const dir = path.join(storagePath, 'temp', generationId)
   ensureDir(dir)
 
-  const srtContent = buildSRT(scenes, totalDurationMs)
+  const srtContent = buildSRT(scenes, durations)
   const srtPath = path.join(dir, 'subtitles.srt')
   fs.writeFileSync(srtPath, srtContent, 'utf-8')
 

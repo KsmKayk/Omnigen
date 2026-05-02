@@ -1,22 +1,35 @@
 import path from 'path'
 import { runPiper } from '../lib/piper'
+import { getAudioDurationMs, concatenateAudioFiles } from '../lib/ffmpeg'
 import { ensureDir } from './asset-download.service'
 import type { SceneBlock } from '../types'
 
-export function buildNarrationText(scenes: SceneBlock[]): string {
-  return scenes.map((s) => s.narration).join(' ')
+export interface SpeechResult {
+  audioPath: string
+  durations: number[]
 }
 
 export async function synthesizeSpeech(
-  narrationText: string,
+  scenes: SceneBlock[],
   generationId: string,
   storagePath: string,
-): Promise<string> {
+): Promise<SpeechResult> {
   const dir = path.join(storagePath, 'temp', generationId)
   ensureDir(dir)
 
-  const outputPath = path.join(dir, 'narration.wav')
-  await runPiper(narrationText, outputPath)
+  const wavPaths: string[] = []
+  const durations: number[] = []
 
-  return outputPath
+  for (const scene of scenes) {
+    const wavPath = path.join(dir, `scene_${scene.sceneId}.wav`)
+    await runPiper(scene.narration, wavPath)
+    const durationMs = await getAudioDurationMs(wavPath)
+    wavPaths.push(wavPath)
+    durations.push(durationMs)
+  }
+
+  const audioPath = path.join(dir, 'narration.wav')
+  await concatenateAudioFiles(wavPaths, audioPath)
+
+  return { audioPath, durations }
 }

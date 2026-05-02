@@ -27,7 +27,7 @@ describe('generateSubtitles', () => {
   afterAll(() => fs.rmSync(TMP, { recursive: true, force: true }))
 
   it('generates a valid .srt file', async () => {
-    const srtPath = await generateSubtitles(SCENES, 'gen1', TMP, 10000)
+    const srtPath = await generateSubtitles(SCENES, [3000, 7000], 'gen1', TMP)
     expect(fs.existsSync(srtPath)).toBe(true)
 
     const content = fs.readFileSync(srtPath, 'utf-8')
@@ -36,11 +36,12 @@ describe('generateSubtitles', () => {
     expect(content).toMatch(/\d+\r?\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}/)
   })
 
-  it('distributes duration proportionally by word count', async () => {
-    const srtPath = await generateSubtitles(SCENES, 'gen2', TMP, 10000)
+  it('uses exact per-scene durations for timestamps', async () => {
+    const srtPath = await generateSubtitles(SCENES, [3000, 7000], 'gen2', TMP)
     const content = fs.readFileSync(srtPath, 'utf-8')
-    // Scene 1: 4 words, scene 2: 7 words. Scene 2 must start after scene 1 ends.
-    // With 10000ms total: scene 1 ≈ 3636ms, scene 2 starts at ~00:00:03,636
-    expect(content).toContain('00:00:03,636 -->')
+    // Scene 1: 0 → 3000ms
+    expect(content).toContain('00:00:00,000 --> 00:00:03,000')
+    // Scene 2: 3000 → 10000ms
+    expect(content).toContain('00:00:03,000 --> 00:00:10,000')
   })
 })
