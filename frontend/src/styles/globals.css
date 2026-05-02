@@ -1,0 +1,18 @@
+@import './design-tokens.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    color: var(--color-near-black);
+    background: var(--color-white);
+    font-family: var(--font-ui);
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+}
