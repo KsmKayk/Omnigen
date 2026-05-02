@@ -49,7 +49,7 @@ export async function renderVideo(opts: RenderOptions): Promise<string> {
       .inputOptions(['-f', 'concat', '-safe', '0'])
       .input(ttsPath)
       .outputOptions([
-        `-vf`, `scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height},subtitles='${subtitlePath.replace(/\\/g, '/')}'`,
+        `-vf`, `scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height},subtitles='${subtitlePath.replace(/\\/g, '/').replace(/^([A-Za-z]):/, '$1\\:')}'`,
         `-c:v`, `libx264`,
         `-c:a`, `aac`,
         `-shortest`,
