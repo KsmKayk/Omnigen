@@ -44,6 +44,23 @@ describe('callLLM', () => {
     await expect(callLLM('test')).rejects.toThrow('LLM returned empty response')
   })
 
+  it('retries on ECONNRESET and succeeds', async () => {
+    nock('https://openrouter.ai').post('/api/v1/chat/completions').replyWithError({ code: 'ECONNRESET' })
+    nock('https://openrouter.ai')
+      .post('/api/v1/chat/completions')
+      .reply(200, { choices: [{ message: { role: 'assistant', content: 'Retried OK' } }] })
+
+    await expect(callLLM('test')).resolves.toBe('Retried OK')
+  })
+
+  it('throws after max retries', async () => {
+    for (let i = 0; i < 3; i++) {
+      nock('https://openrouter.ai').post('/api/v1/chat/completions').replyWithError({ code: 'ECONNRESET' })
+    }
+
+    await expect(callLLM('test')).rejects.toThrow()
+  })
+
   it('includes system prompt when provided', async () => {
     let capturedBody: any
 
