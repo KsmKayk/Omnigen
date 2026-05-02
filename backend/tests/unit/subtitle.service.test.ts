@@ -39,7 +39,8 @@ describe('generateSubtitles', () => {
   it('distributes duration proportionally by word count', async () => {
     const srtPath = await generateSubtitles(SCENES, 'gen2', TMP, 10000)
     const content = fs.readFileSync(srtPath, 'utf-8')
-    // scene 2 has more words, should end later
-    expect(content).toContain('00:00:00,000 --> ')
+    // Scene 1: 4 words, scene 2: 7 words. Scene 2 must start after scene 1 ends.
+    // With 10000ms total: scene 1 ≈ 3636ms, scene 2 starts at ~00:00:03,636
+    expect(content).toContain('00:00:03,636 -->')
   })
 })

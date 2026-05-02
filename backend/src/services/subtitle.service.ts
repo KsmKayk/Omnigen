@@ -17,7 +17,8 @@ export function formatSRTTime(ms: number): string {
 }
 
 function countWords(text: string): number {
-  return text.trim().split(/\s+/).length
+  const trimmed = text.trim()
+  return trimmed === '' ? 0 : trimmed.split(/\s+/).length
 }
 
 function buildSRT(scenes: SceneBlock[], totalDurationMs: number): string {
@@ -31,7 +32,8 @@ function buildSRT(scenes: SceneBlock[], totalDurationMs: number): string {
     const words = countWords(scene.narration)
     const duration = Math.round((words / totalWords) * totalDurationMs)
     const start = cursor
-    const end = cursor + duration
+    // Snap the last block's end to totalDurationMs
+    const end = i === scenes.length - 1 ? totalDurationMs : cursor + duration
 
     blocks.push(
       [
