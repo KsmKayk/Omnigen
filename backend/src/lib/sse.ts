@@ -8,11 +8,12 @@ export const sseHeaders = {
   'X-Accel-Buffering': 'no',
 }
 
+type FlushableResponse = Response & { flush?: () => void }
+
 export function createSSEEmitter(res: Response): EmitFn {
+  const r = res as FlushableResponse
   return (event: ProgressEvent) => {
-    res.write(`data: ${JSON.stringify(event)}\n\n`)
-    if (typeof (res as any).flush === 'function') {
-      (res as any).flush()
-    }
+    r.write(`data: ${JSON.stringify(event)}\n\n`)
+    r.flush?.()
   }
 }

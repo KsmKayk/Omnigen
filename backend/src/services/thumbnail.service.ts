@@ -18,7 +18,7 @@ export async function generateThumbnails(
   const thumbnails: string[] = []
 
   for (let i = 0; i < THUMBNAIL_POSITIONS.length; i++) {
-    const seekSecs = Math.floor(durationSecs * THUMBNAIL_POSITIONS[i])
+    const seekSecs = durationSecs * THUMBNAIL_POSITIONS[i]
     const outputPath = path.join(outputDir, `thumb${i + 1}.jpg`)
     await extractFrame(videoPath, outputPath, seekSecs)
     thumbnails.push(outputPath)
