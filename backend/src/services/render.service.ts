@@ -28,6 +28,10 @@ export async function renderVideo(opts: RenderOptions): Promise<string> {
   const tempDir = path.join(storagePath, 'temp', generationId)
   ensureDir(tempDir)
 
+  if (assets.length !== scenes.length) {
+    throw new Error(`Asset count (${assets.length}) does not match scene count (${scenes.length})`)
+  }
+
   const audioMs = await getAudioDurationMs(ttsPath)
   const { width, height } = RESOLUTIONS[videoType]
   const durationPerScene = Math.floor(audioMs / scenes.length)

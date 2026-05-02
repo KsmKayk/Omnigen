@@ -55,6 +55,24 @@ describe('renderVideo', () => {
     })
 
     expect(mockGetAudioDurationMs).toHaveBeenCalledWith('/tmp/narration.wav')
+    expect(mockBuildConcatFile).toHaveBeenCalledWith(
+      ['/tmp/scene_1.jpg', '/tmp/scene_2.jpg'],
+      25000, // floor(50000 / 2)
+    )
     expect(result).toContain('video.mp4')
+  })
+
+  it('throws when assets and scenes have different lengths', async () => {
+    await expect(
+      renderVideo({
+        generationId: 'gen2',
+        storagePath: '/tmp',
+        assets: MOCK_ASSETS.slice(0, 1), // 1 asset
+        scenes: MOCK_SCENES, // 2 scenes
+        ttsPath: '/tmp/narration.wav',
+        subtitlePath: '/tmp/subtitles.srt',
+        videoType: 'short',
+      })
+    ).rejects.toThrow('does not match')
   })
 })
