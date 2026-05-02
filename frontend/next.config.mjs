@@ -6,6 +6,10 @@ const config = {
         source: '/api/:path*',
         destination: 'http://localhost:3001/api/:path*',
       },
+      {
+        source: '/output/:path*',
+        destination: 'http://localhost:3001/output/:path*',
+      },
     ]
   },
 }

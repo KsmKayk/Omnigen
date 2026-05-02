@@ -9,7 +9,7 @@ const schema = z.object({
   OPENROUTER_BASE_URL: z.string().url().default('https://openrouter.ai/api/v1'),
   OPENROUTER_MODEL: z.string().default('openai/gpt-4o-mini'),
 
-  PIPER_MODEL_PATH: z.string().default('./pt_BR-faber-medium.onnx'),
+  PIPER_MODEL_PATH: z.string().default('pt_BR-faber-medium'),
   FFMPEG_PATH: z.string().default('ffmpeg'),
 
   PEXELS_API_KEY: z.string().min(1),

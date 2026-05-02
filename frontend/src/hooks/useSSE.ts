@@ -25,7 +25,8 @@ export function useSSE() {
   const connect = useCallback((generationId: string) => {
     esRef.current?.close()
 
-    const es = new EventSource(`/api/generation/${generationId}/stream`)
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:3001'
+    const es = new EventSource(`${backendUrl}/api/generation/${generationId}/stream`)
     esRef.current = es
 
     setState((prev) => ({ ...prev, isStreaming: true, error: null }))
