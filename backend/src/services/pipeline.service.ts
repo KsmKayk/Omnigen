@@ -63,7 +63,7 @@ export async function runPipeline(input: PipelineInput): Promise<GenerationResul
     Promise.all(scenes.map((scene) => searchVideos(scene.description))),
   )
 
-  const assets: AssetRecord[] = await withEmit(emit, 'images', 38, 42, 'Baixando assets...', async () => {
+  const assets: AssetRecord[] = await withEmit(emit, 'assets', 38, 42, 'Baixando assets...', async () => {
     const assetsDir = path.join(storagePath, 'temp', generationId, 'assets')
     ensureDir(assetsDir)
     const records: AssetRecord[] = []
@@ -94,10 +94,10 @@ export async function runPipeline(input: PipelineInput): Promise<GenerationResul
     return records
   })
 
-  const narrationText = buildNarrationText(scenes)
-  const ttsPath = await withEmit(emit, 'tts', 42, 55, 'Gerando narração...', () =>
-    synthesizeSpeech(narrationText, generationId, storagePath),
-  )
+  const ttsPath = await withEmit(emit, 'tts', 42, 55, 'Gerando narração...', () => {
+    const narrationText = buildNarrationText(scenes)
+    return synthesizeSpeech(narrationText, generationId, storagePath)
+  })
 
   const subtitlePath = await withEmit(emit, 'subtitles', 55, 60, 'Gerando legendas...', () =>
     generateSubtitles(scenes, generationId, storagePath, 50000),

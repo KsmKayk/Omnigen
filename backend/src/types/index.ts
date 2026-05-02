@@ -11,6 +11,7 @@ export type PipelineStep =
   | 'titles'
   | 'script'
   | 'images'
+  | 'assets'
   | 'videos'
   | 'tts'
   | 'subtitles'
