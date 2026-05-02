@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import pinoHttp from 'pino-http'
 import { logger } from './lib/logger'
+import { initDb } from './db'
 import { generationRouter } from './routes/generation'
 import { historyRouter } from './routes/history'
 import { logsRouter } from './routes/logs'
@@ -31,6 +32,7 @@ export function createApp() {
 
 if (require.main === module) {
   const PORT = parseInt(process.env.PORT ?? '3001', 10)
+  initDb(process.env.DATABASE_URL ?? './storage/omnigen.db')
   const app = createApp()
   app.listen(PORT, () => {
     logger.info({ port: PORT }, 'server started')

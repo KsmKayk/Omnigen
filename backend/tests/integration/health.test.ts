@@ -1,3 +1,6 @@
+process.env.OPENROUTER_API_KEY = 'test'
+process.env.PEXELS_API_KEY = 'test'
+
 import request from 'supertest'
 import { createApp } from '../../src/server'
 
