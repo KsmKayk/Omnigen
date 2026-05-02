@@ -1,11 +1,12 @@
 import express from 'express'
 import cors from 'cors'
 import pinoHttp from 'pino-http'
+import path from 'path'
 import { logger } from './lib/logger'
-import { initDb } from './db'
 import { generationRouter } from './routes/generation'
 import { historyRouter } from './routes/history'
 import { logsRouter } from './routes/logs'
+import { config } from './config'
 
 export function createApp() {
   const app = express()
@@ -22,6 +23,8 @@ export function createApp() {
   app.use('/api/history', historyRouter)
   app.use('/api/logs', logsRouter)
 
+  app.use('/output', express.static(path.join(config.STORAGE_PATH, 'output')))
+
   app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
     logger.error({ err }, 'unhandled error')
     res.status(500).json({ error: err.message })
@@ -31,10 +34,8 @@ export function createApp() {
 }
 
 if (require.main === module) {
-  const PORT = parseInt(process.env.PORT ?? '3001', 10)
-  initDb(process.env.DATABASE_URL ?? './storage/omnigen.db')
   const app = createApp()
-  app.listen(PORT, () => {
-    logger.info({ port: PORT }, 'server started')
+  app.listen(config.PORT, () => {
+    logger.info({ port: config.PORT }, 'server started')
   })
 }
