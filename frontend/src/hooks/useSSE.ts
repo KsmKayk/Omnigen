@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
-import type { ProgressEvent, PipelineStep, StepState } from '../types'
+import type { ProgressEvent, ProgressEventResult, PipelineStep, StepState } from '../types'
 
 interface SSEState {
   isStreaming: boolean
   progress: number
   steps: Partial<Record<PipelineStep, StepState>>
   error: string | null
+  result: ProgressEventResult | null
 }
 
 export function useSSE() {
@@ -16,6 +17,7 @@ export function useSSE() {
     progress: 0,
     steps: {},
     error: null,
+    result: null,
   })
 
   const esRef = useRef<EventSource | null>(null)
@@ -50,6 +52,7 @@ export function useSSE() {
             progress: event.progress,
             steps: updatedSteps,
             error: event.status === 'error' ? (event.error ?? 'Unknown error') : prev.error,
+            result: event.result ?? prev.result,
           }
         })
       } catch {
@@ -70,7 +73,7 @@ export function useSSE() {
 
   const reset = useCallback(() => {
     esRef.current?.close()
-    setState({ isStreaming: false, progress: 0, steps: {}, error: null })
+    setState({ isStreaming: false, progress: 0, steps: {}, error: null, result: null })
   }, [])
 
   return { ...state, connect, disconnect, reset }

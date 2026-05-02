@@ -22,12 +22,20 @@ export type PipelineStep =
   | 'saving'
   | 'completed'
 
+export interface ProgressEventResult {
+  videoPath: string
+  thumbnails: string[]
+  tags: string[]
+  description: string
+}
+
 export interface ProgressEvent {
   step: PipelineStep
   status: 'processing' | 'done' | 'error'
   progress: number
   message?: string
   error?: string
+  result?: ProgressEventResult
 }
 
 export interface SceneBlock {

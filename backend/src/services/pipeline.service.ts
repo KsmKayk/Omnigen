@@ -120,7 +120,22 @@ export async function runPipeline(input: PipelineInput): Promise<GenerationResul
     generateDescription(scriptText),
   )
 
-  emit({ step: 'completed', status: 'done', progress: 100, message: 'Vídeo gerado com sucesso!' })
+  const outputBase = path.join(storagePath, 'output')
+  const toPublicUrl = (localPath: string) =>
+    '/output/' + path.relative(outputBase, localPath).replace(/\\/g, '/')
+
+  emit({
+    step: 'completed',
+    status: 'done',
+    progress: 100,
+    message: 'Vídeo gerado com sucesso!',
+    result: {
+      videoPath: toPublicUrl(videoPath),
+      thumbnails: thumbnails.map(toPublicUrl),
+      tags,
+      description,
+    },
+  })
 
   return {
     generationId,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { GenerationForm } from '../components/GenerationForm'
 import { TitlePicker } from '../components/TitlePicker'
 import { ProgressBar } from '../components/ProgressBar'
@@ -50,6 +50,20 @@ export default function Home() {
       setState({ phase: 'error', message: (err as Error).message })
     }
   }
+
+  useEffect(() => {
+    if (state.phase !== 'generating') return
+    if (!sse.result || sse.isStreaming) return
+    setState({
+      phase: 'completed',
+      generationId: state.generationId,
+      selectedTitle: state.selectedTitle,
+      videoPath: sse.result.videoPath,
+      thumbnails: sse.result.thumbnails,
+      tags: sse.result.tags,
+      description: sse.result.description,
+    })
+  }, [sse.result, sse.isStreaming, state])
 
   const isFormDisabled = state.phase === 'loading_titles' || state.phase === 'generating'
 
