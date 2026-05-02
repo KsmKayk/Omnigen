@@ -8,6 +8,7 @@ import { generationRouter } from './routes/generation'
 import { historyRouter } from './routes/history'
 import { logsRouter } from './routes/logs'
 import { config } from './config'
+import { runStartup } from './startup'
 
 export function createApp() {
   const app = express()
@@ -35,6 +36,7 @@ export function createApp() {
 }
 
 if (require.main === module) {
+  runStartup(config.STORAGE_PATH)
   const app = createApp()
   app.listen(config.PORT, () => {
     logger.info({ port: config.PORT }, 'server started')
