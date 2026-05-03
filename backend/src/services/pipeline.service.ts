@@ -1,7 +1,7 @@
 import path from 'path'
 import { generateScript } from './script.service'
 import { searchImages, searchVideos } from './asset-search.service'
-import { downloadAsset, ensureDir } from './asset-download.service'
+import { downloadWithFallback, ensureDir } from './asset-download.service'
 import { synthesizeSpeech } from './tts.service'
 import { generateSubtitles } from './subtitle.service'
 import { renderVideo } from './render.service'
@@ -70,25 +70,35 @@ export async function runPipeline(input: PipelineInput): Promise<GenerationResul
 
     for (let i = 0; i < scenes.length; i++) {
       const scene = scenes[i]
-      const videoResult = videoSearchResults[i]
-      const imageResult = assetSearchResults[i]
+      const videoCandidates = videoSearchResults[i]
+      const imageCandidates = assetSearchResults[i]
 
-      const source = videoResult ?? imageResult
-      if (!source) continue
+      const videoDestPath = path.join(assetsDir, `scene_${scene.sceneId}.mp4`)
+      const downloadedVideo = await downloadWithFallback(videoCandidates, videoDestPath)
+      if (downloadedVideo) {
+        records.push({
+          sceneId: scene.sceneId,
+          type: 'video',
+          url: downloadedVideo.url,
+          localPath: videoDestPath,
+          width: downloadedVideo.width,
+          height: downloadedVideo.height,
+        })
+        continue
+      }
 
-      const type = videoResult ? 'video' : 'image'
-      const ext = type === 'video' ? 'mp4' : 'jpg'
-      const localPath = path.join(assetsDir, `scene_${scene.sceneId}.${ext}`)
-
-      await downloadAsset(source.url, localPath)
-      records.push({
-        sceneId: scene.sceneId,
-        type,
-        url: source.url,
-        localPath,
-        width: source.width,
-        height: source.height,
-      })
+      const imageDestPath = path.join(assetsDir, `scene_${scene.sceneId}.jpg`)
+      const downloadedImage = await downloadWithFallback(imageCandidates, imageDestPath)
+      if (downloadedImage) {
+        records.push({
+          sceneId: scene.sceneId,
+          type: 'image',
+          url: downloadedImage.url,
+          localPath: imageDestPath,
+          width: downloadedImage.width,
+          height: downloadedImage.height,
+        })
+      }
     }
 
     return records
