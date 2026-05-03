@@ -53,8 +53,8 @@ describe('ensureDir', () => {
 
 describe('downloadWithFallback', () => {
   const TMP_FB = path.join(__dirname, 'tmp_fallback_test')
-  beforeAll(() => fs.mkdirSync(TMP_FB, { recursive: true }))
-  afterAll(() => fs.rmSync(TMP_FB, { recursive: true, force: true }))
+  beforeAll(() => { nock.disableNetConnect(); fs.mkdirSync(TMP_FB, { recursive: true }) })
+  afterAll(() => { nock.enableNetConnect(); fs.rmSync(TMP_FB, { recursive: true, force: true }) })
   afterEach(() => nock.cleanAll())
 
   it('downloads the first successful candidate', async () => {
@@ -82,6 +82,7 @@ describe('downloadWithFallback', () => {
 
     expect(result).not.toBeNull()
     expect(result!.url).toBe('https://cdn.example.com/good.mp4')
+    expect(fs.readFileSync(dest).toString()).toBe('ok')
   })
 
   it('returns null when all candidates fail', async () => {
