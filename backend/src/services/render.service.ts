@@ -62,15 +62,25 @@ export async function renderVideo(opts: RenderOptions): Promise<string> {
 
   const outputPath = path.join(outputDir, 'video.mp4')
 
+  const subtitleStyle =
+    'FontName=Arial,FontSize=22,Bold=1,' +
+    'PrimaryColour=&H00ffffff,OutlineColour=&H00000000,' +
+    'BorderStyle=1,Outline=2,Shadow=0,Alignment=2,MarginV=50'
+  const escapedSub = subtitlePath.replace(/\\/g, '/').replace(/^([A-Za-z]):/, '$1\\:')
+
   return new Promise((resolve, reject) => {
     ffmpeg()
       .input(concatPath)
       .inputOptions(['-f', 'concat', '-safe', '0'])
       .input(ttsPath)
       .outputOptions([
-        `-vf`, `scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height},subtitles='${subtitlePath.replace(/\\/g, '/').replace(/^([A-Za-z]):/, '$1\\:')}'`,
+        `-vf`, `scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height},subtitles='${escapedSub}':force_style='${subtitleStyle}'`,
         `-c:v`, `libx264`,
+        `-crf`, `18`,
+        `-preset`, `fast`,
         `-c:a`, `aac`,
+        `-b:a`, `192k`,
+        `-movflags`, `+faststart`,
         `-map`, `0:v:0`,
         `-map`, `1:a:0`,
         `-shortest`,

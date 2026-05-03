@@ -91,7 +91,7 @@ export async function downloadVideoSegment(url: string, destPath: string, maxSec
     await execFileAsync('yt-dlp', [
       '--download-sections', `*0:00-${maxSeconds}`,
       '--no-playlist',
-      '-f', 'bestvideo[height<=1080]+bestaudio/best',
+      '-f', 'bestvideo[height>=720][height<=1080]+bestaudio/best[height>=720]/best',
       '--merge-output-format', 'mp4',
       '--no-warnings',
       '-o', destPath,

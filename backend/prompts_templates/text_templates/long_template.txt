@@ -10,6 +10,12 @@ O roteiro deve:
 - Ter uma conclusão marcante
 - Ser em português do Brasil
 - Estar formatado com indicações de cena separadas por linhas
+- A narrativa da cena deve ser direta
+
+O roteiro NÃO deve:
+- Não deve vir descrita narrativa: texto
+
+NENHUMA FALA DEVE COMEÇAR ESCRITO "narrativa:" ou "narração:" ou qualquer variante disso
 
 Formato esperado:
 [CENA 1] Descrição da cena

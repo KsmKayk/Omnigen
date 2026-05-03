@@ -16,79 +16,82 @@ const mockCallLLM = openrouter.callLLM as jest.MockedFunction<typeof openrouter.
 describe('searchImages', () => {
   afterEach(() => jest.clearAllMocks())
 
-  it('returns candidate array from googleImageSearch', async () => {
+  it('uses LLM to build query and returns HD-filtered results', async () => {
+    mockCallLLM.mockResolvedValueOnce('Zeus thunder')
     mockImageSearch.mockResolvedValueOnce([
       { url: 'https://example.com/1.jpg', width: 1920, height: 1080 },
       { url: 'https://example.com/2.jpg', width: 1280, height: 720 },
     ])
 
-    const results = await searchImages('Zeus thunder', 'portrait')
+    const results = await searchImages('Zeus lança raios sobre o Olimpo', 'portrait')
+    expect(mockCallLLM).toHaveBeenCalledTimes(1)
+    expect(mockImageSearch).toHaveBeenCalledWith('Zeus thunder vertical HD', 5)
     expect(results).toHaveLength(2)
     expect(results[0].url).toBe('https://example.com/1.jpg')
-    expect(mockImageSearch).toHaveBeenCalledWith('Zeus thunder portrait', 5)
-    expect(mockCallLLM).not.toHaveBeenCalled()
   })
 
-  it('appends orientation to query', async () => {
-    mockImageSearch.mockResolvedValueOnce([{ url: 'https://example.com/1.jpg', width: 1920, height: 1080 }])
-    await searchImages('forest fire', 'landscape')
-    expect(mockImageSearch).toHaveBeenCalledWith('forest fire landscape', 5)
-  })
+  it('filters out images below 720p and retries without qualifier', async () => {
+    mockCallLLM.mockResolvedValueOnce('Zeus thunder')
+    mockImageSearch
+      .mockResolvedValueOnce([{ url: 'https://example.com/low.jpg', width: 640, height: 480 }])
+      .mockResolvedValueOnce([{ url: 'https://example.com/hd.jpg', width: 1920, height: 1080 }])
 
-  it('simplifies query via LLM and retries when first search returns empty', async () => {
-    mockImageSearch.mockResolvedValueOnce([]) // first attempt: empty
-    mockCallLLM.mockResolvedValueOnce('lightning storm')
-    mockImageSearch.mockResolvedValueOnce([{ url: 'https://example.com/simplified.jpg', width: 1920, height: 1080 }])
-
-    const results = await searchImages('Zeus lança raios sobre o Olimpo enquanto os titãs se rebelam', 'portrait')
-    expect(mockCallLLM).toHaveBeenCalledTimes(1)
+    const results = await searchImages('Zeus lança raios', 'portrait')
     expect(mockImageSearch).toHaveBeenCalledTimes(2)
-    expect(mockImageSearch).toHaveBeenLastCalledWith('lightning storm portrait', 5)
+    expect(mockImageSearch).toHaveBeenLastCalledWith('Zeus thunder', 5)
     expect(results).toHaveLength(1)
-    expect(results[0].url).toBe('https://example.com/simplified.jpg')
+    expect(results[0].url).toBe('https://example.com/hd.jpg')
   })
 
-  it('returns empty array when both original and simplified search return nothing', async () => {
-    mockImageSearch.mockResolvedValue([])
-    mockCallLLM.mockResolvedValueOnce('generic query')
+  it('returns empty array when no HD results found after fallback', async () => {
+    mockCallLLM.mockResolvedValueOnce('Zeus thunder')
+    mockImageSearch.mockResolvedValue([{ url: 'https://example.com/low.jpg', width: 640, height: 480 }])
 
-    const results = await searchImages('nothing', 'portrait')
+    const results = await searchImages('Zeus lança raios', 'portrait')
     expect(results).toEqual([])
+  })
+
+  it('appends vertical for portrait, horizontal for landscape', async () => {
+    mockCallLLM.mockResolvedValueOnce('forest fire')
+    mockImageSearch.mockResolvedValueOnce([{ url: 'https://example.com/1.jpg', width: 1920, height: 1080 }])
+
+    await searchImages('forest fire scene', 'landscape')
+    expect(mockImageSearch).toHaveBeenCalledWith('forest fire horizontal HD', 5)
   })
 })
 
 describe('searchVideos', () => {
   afterEach(() => jest.clearAllMocks())
 
-  it('returns candidate array from googleVideoSearch', async () => {
+  it('uses LLM to build query and appends cinematic qualifier', async () => {
+    mockCallLLM.mockResolvedValueOnce('storm lightning')
     mockVideoSearch.mockResolvedValueOnce([
-      { url: 'https://cdn.example.com/storm.mp4', width: 1920, height: 1080 },
+      { url: 'https://www.youtube.com/watch?v=abc', width: 1920, height: 1080 },
     ])
 
-    const results = await searchVideos('storm lightning')
+    const results = await searchVideos('storm and lightning scene')
+    expect(mockCallLLM).toHaveBeenCalledTimes(1)
+    expect(mockVideoSearch).toHaveBeenCalledWith('storm lightning cinematic 4K footage', 5)
     expect(results).toHaveLength(1)
-    expect(results[0].url).toContain('.mp4')
-    expect(mockVideoSearch).toHaveBeenCalledWith('storm lightning', 5)
-    expect(mockCallLLM).not.toHaveBeenCalled()
   })
 
-  it('simplifies query via LLM and retries when no videos found', async () => {
-    mockVideoSearch.mockResolvedValueOnce([])
+  it('retries without quality qualifier when first search returns nothing', async () => {
     mockCallLLM.mockResolvedValueOnce('storm clouds')
-    mockVideoSearch.mockResolvedValueOnce([{ url: 'https://cdn.example.com/storm.mp4', width: 1920, height: 1080 }])
+    mockVideoSearch
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ url: 'https://www.youtube.com/watch?v=xyz', width: 1920, height: 1080 }])
 
-    const results = await searchVideos('cena complexa com efeitos especiais')
-    expect(mockCallLLM).toHaveBeenCalledTimes(1)
+    const results = await searchVideos('storm clouds rolling in')
     expect(mockVideoSearch).toHaveBeenCalledTimes(2)
     expect(mockVideoSearch).toHaveBeenLastCalledWith('storm clouds', 5)
     expect(results).toHaveLength(1)
   })
 
-  it('returns empty array when no videos found even after simplification', async () => {
-    mockVideoSearch.mockResolvedValue([])
+  it('returns empty array when no videos found even after fallback', async () => {
     mockCallLLM.mockResolvedValueOnce('generic')
+    mockVideoSearch.mockResolvedValue([])
 
-    const results = await searchVideos('obscure')
+    const results = await searchVideos('obscure scene description')
     expect(results).toEqual([])
   })
 })
