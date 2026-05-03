@@ -21,9 +21,34 @@ describe('getAudioDurationMs', () => {
 })
 
 describe('buildConcatFile', () => {
-  it('generates ffmpeg concat file content', () => {
-    const content = buildConcatFile(['/tmp/scene1.jpg', '/tmp/scene2.jpg'], 5000)
+  it('uses duration for images', () => {
+    const content = buildConcatFile(
+      [{ localPath: '/tmp/scene1.jpg', type: 'image' }, { localPath: '/tmp/scene2.jpg', type: 'image' }],
+      5000,
+    )
     expect(content).toContain("file '/tmp/scene1.jpg'")
     expect(content).toContain('duration 5')
+    expect(content).not.toContain('inpoint')
+  })
+
+  it('uses inpoint/outpoint for videos', () => {
+    const content = buildConcatFile(
+      [{ localPath: '/tmp/scene1.mp4', type: 'video' }],
+      3500,
+    )
+    expect(content).toContain("file '/tmp/scene1.mp4'")
+    expect(content).toContain('inpoint 0')
+    expect(content).toContain('outpoint 3.5')
+    expect(content).not.toContain('duration')
+  })
+
+  it('handles mixed image and video assets', () => {
+    const content = buildConcatFile(
+      [{ localPath: '/tmp/scene1.mp4', type: 'video' }, { localPath: '/tmp/scene2.jpg', type: 'image' }],
+      4000,
+    )
+    expect(content).toContain('inpoint 0')
+    expect(content).toContain('outpoint 4')
+    expect(content).toContain('duration 4')
   })
 })

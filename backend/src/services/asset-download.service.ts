@@ -121,7 +121,18 @@ export async function downloadVideoSegment(url: string, destPath: string, maxSec
     ])
     const actualFull = fs.existsSync(tmpFull) ? tmpFull : `${tmpFull}.mp4`
     if (!fs.existsSync(actualFull)) throw new Error(`yt-dlp produced no output for ${url}`)
-    await execFileAsync(ffmpegPath, ['-i', actualFull, '-t', String(maxSeconds), '-c', 'copy', '-y', destPath])
+    // Re-encode instead of copy: destPath has no .mp4 extension so -c copy
+    // can't detect the muxer, and VP9/AV1 streams can't be stream-copied to mp4
+    await execFileAsync(ffmpegPath, [
+      '-i', actualFull,
+      '-t', String(maxSeconds),
+      '-map', '0:v:0',
+      '-map', '0:a:0?',
+      '-c:v', 'libx264', '-preset', 'ultrafast',
+      '-c:a', 'aac',
+      '-f', 'mp4',
+      '-y', destPath,
+    ])
   } finally {
     try { fs.unlinkSync(tmpFull) } catch { }
     try { fs.unlinkSync(`${tmpFull}.mp4`) } catch { }

@@ -1,4 +1,4 @@
-﻿process.env.OPENROUTER_API_KEY = 'test'
+process.env.OPENROUTER_API_KEY = 'test'
 process.env.SERPAPI_KEY = 'test-serpapi-key'
 
 jest.mock('../../src/lib/ffmpeg')
@@ -17,7 +17,6 @@ jest.mock('fluent-ffmpeg', () => {
   return mockFfmpeg
 })
 
-import path from 'path'
 import * as ffmpegLib from '../../src/lib/ffmpeg'
 import { renderVideo } from '../../src/services/render.service'
 import type { AssetRecord, SceneBlock } from '../../src/types'
@@ -47,7 +46,7 @@ const MOCK_SCENES: SceneBlock[] = [
 describe('renderVideo', () => {
   beforeEach(() => jest.clearAllMocks())
 
-  it('calls getAudioDurationMs and returns output path', async () => {
+  it('passes assets directly to buildConcatFile', async () => {
     mockGetAudioDurationMs.mockResolvedValueOnce(50000)
     mockBuildConcatFile.mockReturnValueOnce("file '/tmp/scene_1.jpg'\nduration 25")
 
@@ -62,14 +61,11 @@ describe('renderVideo', () => {
     })
 
     expect(mockGetAudioDurationMs).toHaveBeenCalledWith('/tmp/narration.wav')
-    expect(mockBuildConcatFile).toHaveBeenCalledWith(
-      ['/tmp/scene_1.jpg', '/tmp/scene_2.jpg'],
-      25000, // floor(50000 / 2)
-    )
+    expect(mockBuildConcatFile).toHaveBeenCalledWith(MOCK_ASSETS, 25000)
     expect(result).toContain('video.mp4')
   })
 
-  it('pre-trims video assets and passes trimmed path to buildConcatFile', async () => {
+  it('passes video assets without pre-trimming (inpoint/outpoint handled by buildConcatFile)', async () => {
     mockGetAudioDurationMs.mockResolvedValueOnce(50000)
     mockBuildConcatFile.mockReturnValueOnce('')
 
@@ -83,10 +79,7 @@ describe('renderVideo', () => {
       videoType: 'short',
     })
 
-    const [paths, duration] = mockBuildConcatFile.mock.calls[0]
-    expect(paths[0]).toContain('scene_1_trim.mp4') // video → trimmed path
-    expect(paths[1]).toBe('/tmp/scene_2.jpg')       // image → original path
-    expect(duration).toBe(25000)
+    expect(mockBuildConcatFile).toHaveBeenCalledWith(MOCK_ASSETS_WITH_VIDEO, 25000)
   })
 
   it('throws when assets and scenes have different lengths', async () => {
@@ -94,8 +87,8 @@ describe('renderVideo', () => {
       renderVideo({
         generationId: 'gen2',
         storagePath: '/tmp',
-        assets: MOCK_ASSETS.slice(0, 1), // 1 asset
-        scenes: MOCK_SCENES, // 2 scenes
+        assets: MOCK_ASSETS.slice(0, 1),
+        scenes: MOCK_SCENES,
         ttsPath: '/tmp/narration.wav',
         subtitlePath: '/tmp/subtitles.srt',
         videoType: 'short',

@@ -40,10 +40,22 @@ export async function getAudioDurationMs(wavPath: string): Promise<number> {
   })
 }
 
-export function buildConcatFile(imagePaths: string[], durationPerSceneMs: number): string {
+interface ConcatAsset {
+  localPath: string
+  type: 'image' | 'video'
+}
+
+export function buildConcatFile(assets: ConcatAsset[], durationPerSceneMs: number): string {
   const durationSecs = durationPerSceneMs / 1000
-  return imagePaths
-    .map((p) => `file '${p.replace(/\\/g, '/')}'\nduration ${durationSecs}`)
+  return assets
+    .map(({ localPath, type }) => {
+      const p = localPath.replace(/\\/g, '/')
+      if (type === 'video') {
+        // inpoint/outpoint trims the clip inline — no separate ffmpeg trim step needed
+        return `file '${p}'\ninpoint 0\noutpoint ${durationSecs}`
+      }
+      return `file '${p}'\nduration ${durationSecs}`
+    })
     .join('\n')
 }
 
