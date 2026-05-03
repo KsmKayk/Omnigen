@@ -34,15 +34,12 @@ function serpFetch(params: Record<string, string>): Promise<SerpResponse> {
           reject(new Error(`Failed to parse SerpAPI response: ${e}`))
           return
         }
-        if (parsed.error) {
-          reject(new Error(`SerpAPI error: ${parsed.error}`))
-          return
-        }
         const status = res.statusCode ?? 0
         if (status >= 400) {
-          reject(new Error(`SerpAPI HTTP ${status}`))
+          reject(new Error(`SerpAPI HTTP ${status}: ${parsed.error ?? data}`))
           return
         }
+        // "no results" is a soft response — resolve as empty, not an error
         resolve(parsed)
       })
     })

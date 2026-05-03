@@ -45,9 +45,15 @@ describe('googleImageSearch', () => {
     expect(capturedQuery.num).toBe('10')
   })
 
-  it('throws on SerpAPI error response', async () => {
-    nock(BASE).get('/search.json').query(true).reply(200, { error: 'Invalid API key.' })
-    await expect(googleImageSearch('test', 5)).rejects.toThrow('SerpAPI error: Invalid API key.')
+  it('returns empty array on SerpAPI no-results error', async () => {
+    nock(BASE).get('/search.json').query(true).reply(200, { error: "Google hasn't returned any results for this query." })
+    const results = await googleImageSearch('test', 5)
+    expect(results).toEqual([])
+  })
+
+  it('throws on HTTP 401 (invalid API key)', async () => {
+    nock(BASE).get('/search.json').query(true).reply(401, { error: 'Invalid API key.' })
+    await expect(googleImageSearch('test', 5)).rejects.toThrow('SerpAPI HTTP 401')
   })
 })
 
