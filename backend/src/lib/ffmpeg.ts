@@ -51,8 +51,8 @@ export function buildConcatFile(assets: ConcatAsset[], durationPerSceneMs: numbe
     .map(({ localPath, type }) => {
       const p = localPath.replace(/\\/g, '/')
       if (type === 'video') {
-        // inpoint/outpoint trims the clip inline — no separate ffmpeg trim step needed
-        return `file '${p}'\ninpoint 0\noutpoint ${durationSecs}`
+        // Videos are pre-trimmed to exact scene duration before concatenation
+        return `file '${p}'`
       }
       return `file '${p}'\nduration ${durationSecs}`
     })

@@ -31,14 +31,14 @@ describe('buildConcatFile', () => {
     expect(content).not.toContain('inpoint')
   })
 
-  it('uses inpoint/outpoint for videos', () => {
+  it('uses only file entry for pre-trimmed videos (no duration/inpoint/outpoint)', () => {
     const content = buildConcatFile(
       [{ localPath: '/tmp/scene1.mp4', type: 'video' }],
       3500,
     )
     expect(content).toContain("file '/tmp/scene1.mp4'")
-    expect(content).toContain('inpoint 0')
-    expect(content).toContain('outpoint 3.5')
+    expect(content).not.toContain('inpoint')
+    expect(content).not.toContain('outpoint')
     expect(content).not.toContain('duration')
   })
 
@@ -47,8 +47,8 @@ describe('buildConcatFile', () => {
       [{ localPath: '/tmp/scene1.mp4', type: 'video' }, { localPath: '/tmp/scene2.jpg', type: 'image' }],
       4000,
     )
-    expect(content).toContain('inpoint 0')
-    expect(content).toContain('outpoint 4')
+    expect(content).not.toContain('inpoint')
+    expect(content).not.toContain('outpoint')
     expect(content).toContain('duration 4')
   })
 })

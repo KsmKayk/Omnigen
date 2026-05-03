@@ -65,7 +65,7 @@ describe('renderVideo', () => {
     expect(result).toContain('video.mp4')
   })
 
-  it('passes video assets without pre-trimming (inpoint/outpoint handled by buildConcatFile)', async () => {
+  it('pre-trims video assets before passing to buildConcatFile', async () => {
     mockGetAudioDurationMs.mockResolvedValueOnce(50000)
     mockBuildConcatFile.mockReturnValueOnce('')
 
@@ -79,7 +79,11 @@ describe('renderVideo', () => {
       videoType: 'short',
     })
 
-    expect(mockBuildConcatFile).toHaveBeenCalledWith(MOCK_ASSETS_WITH_VIDEO, 25000)
+    // buildConcatFile receives processed assets: video replaced with trimmed path
+    const [calledAssets, calledDuration] = mockBuildConcatFile.mock.calls[0]
+    expect(calledDuration).toBe(25000)
+    expect(calledAssets[0].localPath).toContain('scene_1_trim.mp4')
+    expect(calledAssets[1].localPath).toBe(MOCK_ASSETS_WITH_VIDEO[1].localPath)
   })
 
   it('throws when assets and scenes have different lengths', async () => {

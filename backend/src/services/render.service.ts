@@ -36,8 +36,34 @@ export async function renderVideo(opts: RenderOptions): Promise<string> {
   const { width, height } = RESOLUTIONS[videoType]
   const durationPerScene = Math.floor(audioMs / scenes.length)
 
-  // buildConcatFile uses inpoint/outpoint for videos, duration for images
-  const concatContent = buildConcatFile(assets, durationPerScene)
+  // Pre-trim video assets to exact scene duration using libx264 re-encode
+  // (stream copy fails for VP9/AV1; inpoint/outpoint collapses all clips to ts=0)
+  const processedAssets: AssetRecord[] = []
+  for (const asset of assets) {
+    if (asset.type === 'video') {
+      const trimmedPath = path.join(tempDir, `scene_${asset.sceneId}_trim.mp4`)
+      await new Promise<void>((resolve, reject) => {
+        ffmpeg(asset.localPath)
+          .outputOptions([
+            '-t', String(durationPerScene / 1000),
+            '-map', '0:v:0',
+            '-map', '0:a:0?',
+            '-c:v', 'libx264', '-preset', 'ultrafast',
+            '-c:a', 'aac',
+            '-y',
+          ])
+          .output(trimmedPath)
+          .on('end', () => resolve())
+          .on('error', reject)
+          .run()
+      })
+      processedAssets.push({ ...asset, localPath: trimmedPath })
+    } else {
+      processedAssets.push(asset)
+    }
+  }
+
+  const concatContent = buildConcatFile(processedAssets, durationPerScene)
   const concatPath = path.join(tempDir, 'concat.txt')
   fs.writeFileSync(concatPath, concatContent, 'utf-8')
 

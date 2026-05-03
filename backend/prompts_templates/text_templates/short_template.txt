@@ -14,6 +14,8 @@ O roteiro deve:
 O roteiro NÃO deve:
 - Não deve vir descrita narrativa: texto
 
+NENHUMA FALA DEVE COMEÇAR ESCRITO "narrativa:" ou "narração:" ou qualquer variante disso 
+
 Formato esperado:
 [CENA 1] Descrição da cena
 Narrativa da cena...
@@ -22,3 +24,22 @@ Narrativa da cena...
 Narrativa da cena...
 
 (Por favor, continue este formato para todas as cenas)
+
+exemplos de historia para se guiar no formato de escrita:
+
+1- 
+
+ A história do Deus Hefesto. Tudo começou quando a deusa Hera engravidou de Zeus, e como a criança seria filho do rei e da rainha do Olimpo. A deusa imagina o quão bonito seria seu filho, porém quando a criança nasceu, a deusa ficou horrorizada com sua aparência, pois o bebê nasceu com aparência deformada e cheia de pelos.
+
+ A deusa para se livrar da situação, jogou o bebê do alto do Olimpo até o oceano. Após a queda o bebê se chocou violentamente contra o mar, assim ficando aleijado de uma perna e passando a mancar pelo resto da vida. A ninfa Tethys resgatou o bebê e nomeou-o de Hefesto e o levou para uma ilha próxima. Nessa ilha Hefesto cresceu e desenvolveu grandes habilidades com a forja, criando as mais poderosas armas e joias. Até que certo dia Hefesto decidiu voltar ao Olimpo. Quando chegou Hefesto presenteou a deusa Hera.
+
+ Com um belíssimo trono de ouro, quando a deusa se sentou, o trono a correntou e mesmo com toda a sua força e com a ajuda de outros deuses as correntes não quebravam. Então Hefesto propõe libertar a deusa, mas em troca pede a Efrodite como sua esposa e que os outros deuses também aceite ele no Olimpo. Zeus concorda com a troca, assim Hefesto se tornou o deus do fogo, da forja, das armas e se casou com a deusa mais bela do Olimpo.
+
+2- 
+
+ Tudo começou com Saturno, o deus do tempo, que foi deposto por seu filho Júpiter, o deus supremo. Júpiter liderou os deuses, governando os céus e a terra com seu poder absoluto. Marte, deus da guerra, ajudou Roma a alcançar a glória, enquanto Vênus, deusa do amor, deu aos humanos paixão e desejo.
+
+ Roma foi fundada por Rômulo e Remo, irmãos gêmeos criados por uma loba. Enéas, príncipe troiano, teve um papel crucial no destino de Roma. Mercúrio, mensageiro dos deuses, guiava as almas ao submundo de Plutão. Netuno controlava os mares, Diana protegia as florestas. E Cupido, deus do amor, viveu uma trágica história com Psique, representando o poder e os desafios do amor.
+
+ Minerva concedia sabedoria e Janus, o deus de duas faces, governava os começos e fins.
+
