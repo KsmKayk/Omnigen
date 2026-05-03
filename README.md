@@ -90,14 +90,20 @@ OPENROUTER_API_KEY=your_openrouter_key_here
 SERPAPI_KEY=your_serpapi_key_here
 ```
 
-### 3. Run database migrations
+### 3. Download piper model
+
+```bash
+python -m piper.download_voices pt_BR-faber-medium
+```
+
+### 4. Run database migrations
 
 ```bash
 pnpm --filter omnigen-backend db:generate
 pnpm --filter omnigen-backend db:migrate
 ```
 
-### 4. Start development servers
+### 5. Start development servers
 
 ```bash
 # Terminal 1 — backend (port 3001)
