@@ -1,12 +1,8 @@
 import { googleImageSearch, googleVideoSearch } from '../lib/google-search'
+import type { AssetSearchResult } from '../types'
 
+export type { AssetSearchResult }
 export type Orientation = 'portrait' | 'landscape'
-
-export interface AssetSearchResult {
-  url: string
-  width: number
-  height: number
-}
 
 const CANDIDATES_PER_SCENE = 5
 

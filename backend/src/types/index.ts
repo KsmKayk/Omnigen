@@ -53,6 +53,12 @@ export interface AssetRecord {
   height: number
 }
 
+export interface AssetSearchResult {
+  url: string
+  width: number
+  height: number
+}
+
 export interface Generation {
   id: string
   theme: string

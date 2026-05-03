@@ -1,6 +1,6 @@
 import https from 'https'
 import { config } from '../config'
-import type { AssetSearchResult } from '../services/asset-search.service'
+import type { AssetSearchResult } from '../types'
 
 interface CseItem {
   link: string
