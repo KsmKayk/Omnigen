@@ -11,17 +11,30 @@ interface CseResponse {
   items?: CseItem[]
 }
 
+interface CseErrorResponse {
+  error?: { code?: number; message?: string }
+}
+
 function cseFetch(url: string): Promise<CseResponse> {
   return new Promise((resolve, reject) => {
     const req = https.get(url, (res) => {
       let data = ''
       res.on('data', (chunk) => (data += chunk))
       res.on('end', () => {
+        let parsed: CseResponse & CseErrorResponse
         try {
-          resolve(JSON.parse(data) as CseResponse)
+          parsed = JSON.parse(data) as CseResponse & CseErrorResponse
         } catch (e) {
           reject(new Error(`Failed to parse Google CSE response: ${e}`))
+          return
         }
+        const status = res.statusCode ?? 0
+        if (status >= 400) {
+          const msg = parsed.error?.message ?? `HTTP ${status}`
+          reject(new Error(`Google CSE error ${parsed.error?.code ?? status}: ${msg}`))
+          return
+        }
+        resolve(parsed)
       })
     })
     req.on('error', reject)

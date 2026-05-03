@@ -101,6 +101,10 @@ export async function runPipeline(input: PipelineInput): Promise<GenerationResul
       }
     }
 
+    if (records.length === 0) {
+      throw new Error('Nenhum asset foi baixado. Verifique as chaves GOOGLE_API_KEY e GOOGLE_CSE_ID no .env.')
+    }
+
     return records
   })
 
