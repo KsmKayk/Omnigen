@@ -16,3 +16,6 @@ drizzle/
 .env.*.local
 *.tsbuildinfo
 .pnpm-debug.log*
+
+pt_BR-faber-medium.onnx
+pt_BR-faber-medium.onnx.json
