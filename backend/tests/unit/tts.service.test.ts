@@ -1,6 +1,5 @@
-process.env.OPENROUTER_API_KEY = 'test'
-process.env.GOOGLE_API_KEY = 'test-google-key'
-process.env.GOOGLE_CSE_ID = 'test-cse-id'
+﻿process.env.OPENROUTER_API_KEY = 'test'
+process.env.SERPAPI_KEY = 'test-serpapi-key'
 
 jest.mock('../../src/lib/piper')
 jest.mock('../../src/lib/ffmpeg')
@@ -17,7 +16,7 @@ const mockConcatenate = ffmpeg.concatenateAudioFiles as jest.MockedFunction<type
 
 const SCENES: SceneBlock[] = [
   { sceneId: 1, description: 'Abertura', narration: 'Zeus governava o olimpo.' },
-  { sceneId: 2, description: 'Conflito', narration: 'Os titãs se rebelaram.' },
+  { sceneId: 2, description: 'Conflito', narration: 'Os titÃ£s se rebelaram.' },
 ]
 
 describe('synthesizeSpeech', () => {
@@ -37,7 +36,7 @@ describe('synthesizeSpeech', () => {
       expect.stringContaining(path.join('gen1', 'scene_1.wav')),
     )
     expect(mockRunPiper).toHaveBeenCalledWith(
-      'Os titãs se rebelaram.',
+      'Os titÃ£s se rebelaram.',
       expect.stringContaining(path.join('gen1', 'scene_2.wav')),
     )
   })

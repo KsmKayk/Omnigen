@@ -1,9 +1,8 @@
-import { createSSEEmitter, sseHeaders } from '../../src/lib/sse'
+﻿import { createSSEEmitter, sseHeaders } from '../../src/lib/sse'
 import type { ProgressEvent } from '../../src/types'
 
 process.env.OPENROUTER_API_KEY = 'test'
-process.env.GOOGLE_API_KEY = 'test-google-key'
-process.env.GOOGLE_CSE_ID = 'test-cse-id'
+process.env.SERPAPI_KEY = 'test-serpapi-key'
 
 describe('sseHeaders', () => {
   it('contains required SSE headers', () => {

@@ -1,24 +1,23 @@
 process.env.OPENROUTER_API_KEY = 'test'
-process.env.GOOGLE_API_KEY = 'test-google-key'
-process.env.GOOGLE_CSE_ID = 'test-cse-id'
+process.env.SERPAPI_KEY = 'test-serpapi-key'
 process.env.NODE_ENV = 'test'
 
 import nock from 'nock'
 import { googleImageSearch, googleVideoSearch } from '../../src/lib/google-search'
 
-const BASE = 'https://www.googleapis.com'
+const BASE = 'https://serpapi.com'
 
 describe('googleImageSearch', () => {
   afterEach(() => nock.cleanAll())
 
-  it('returns image candidates from CSE response', async () => {
+  it('returns image candidates from SerpAPI response', async () => {
     nock(BASE)
-      .get('/customsearch/v1')
+      .get('/search.json')
       .query(true)
       .reply(200, {
-        items: [
-          { link: 'https://example.com/img1.jpg', image: { width: 1920, height: 1080 } },
-          { link: 'https://example.com/img2.jpg', image: { width: 1280, height: 720 } },
+        images_results: [
+          { original: 'https://example.com/img1.jpg', original_width: 1920, original_height: 1080 },
+          { original: 'https://example.com/img2.jpg', original_width: 1280, original_height: 720 },
         ],
       })
 
@@ -30,7 +29,7 @@ describe('googleImageSearch', () => {
   })
 
   it('returns empty array when no items', async () => {
-    nock(BASE).get('/customsearch/v1').query(true).reply(200, {})
+    nock(BASE).get('/search.json').query(true).reply(200, {})
     const results = await googleImageSearch('nothing found', 5)
     expect(results).toEqual([])
   })
@@ -38,12 +37,17 @@ describe('googleImageSearch', () => {
   it('caps count at 10', async () => {
     let capturedQuery: Record<string, string> = {}
     nock(BASE)
-      .get('/customsearch/v1')
+      .get('/search.json')
       .query((q) => { capturedQuery = q as Record<string, string>; return true })
-      .reply(200, { items: [] })
+      .reply(200, { images_results: [] })
 
     await googleImageSearch('test', 20)
     expect(capturedQuery.num).toBe('10')
+  })
+
+  it('throws on SerpAPI error response', async () => {
+    nock(BASE).get('/search.json').query(true).reply(200, { error: 'Invalid API key.' })
+    await expect(googleImageSearch('test', 5)).rejects.toThrow('SerpAPI error: Invalid API key.')
   })
 })
 
@@ -52,10 +56,10 @@ describe('googleVideoSearch', () => {
 
   it('returns only direct mp4 links', async () => {
     nock(BASE)
-      .get('/customsearch/v1')
+      .get('/search.json')
       .query(true)
       .reply(200, {
-        items: [
+        organic_results: [
           { link: 'https://cdn.example.com/video.mp4' },
           { link: 'https://www.youtube.com/watch?v=abc' },
           { link: 'https://cdn.example.com/clip.MP4?token=xyz' },
@@ -70,9 +74,9 @@ describe('googleVideoSearch', () => {
 
   it('returns empty array when no mp4 links found', async () => {
     nock(BASE)
-      .get('/customsearch/v1')
+      .get('/search.json')
       .query(true)
-      .reply(200, { items: [{ link: 'https://youtube.com/watch?v=x' }] })
+      .reply(200, { organic_results: [{ link: 'https://youtube.com/watch?v=x' }] })
 
     const results = await googleVideoSearch('test', 5)
     expect(results).toEqual([])

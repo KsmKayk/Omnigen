@@ -1,17 +1,16 @@
-import fs from 'fs'
+﻿import fs from 'fs'
 import path from 'path'
 import { generateSubtitles, formatSRTTime } from '../../src/services/subtitle.service'
 import type { SceneBlock } from '../../src/types'
 
 process.env.OPENROUTER_API_KEY = 'test'
-process.env.GOOGLE_API_KEY = 'test-google-key'
-process.env.GOOGLE_CSE_ID = 'test-cse-id'
+process.env.SERPAPI_KEY = 'test-serpapi-key'
 
 const TMP = path.join(__dirname, 'tmp_subtitle_test')
 
 const SCENES: SceneBlock[] = [
   { sceneId: 1, description: 'Abertura', narration: 'Zeus governava o mundo.' },
-  { sceneId: 2, description: 'Conflito', narration: 'Os titãs se rebelaram contra os deuses.' },
+  { sceneId: 2, description: 'Conflito', narration: 'Os titÃ£s se rebelaram contra os deuses.' },
 ]
 
 describe('formatSRTTime', () => {
@@ -33,16 +32,16 @@ describe('generateSubtitles', () => {
 
     const content = fs.readFileSync(srtPath, 'utf-8')
     expect(content).toContain('Zeus governava o mundo.')
-    expect(content).toContain('Os titãs se rebelaram')
+    expect(content).toContain('Os titÃ£s se rebelaram')
     expect(content).toMatch(/\d+\r?\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}/)
   })
 
   it('uses exact per-scene durations for timestamps', async () => {
     const srtPath = await generateSubtitles(SCENES, [3000, 7000], 'gen2', TMP)
     const content = fs.readFileSync(srtPath, 'utf-8')
-    // Scene 1: 0 → 3000ms
+    // Scene 1: 0 â†’ 3000ms
     expect(content).toContain('00:00:00,000 --> 00:00:03,000')
-    // Scene 2: 3000 → 10000ms
+    // Scene 2: 3000 â†’ 10000ms
     expect(content).toContain('00:00:03,000 --> 00:00:10,000')
   })
 })

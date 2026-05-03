@@ -1,6 +1,5 @@
-process.env.OPENROUTER_API_KEY = 'test'
-process.env.GOOGLE_API_KEY = 'test-google-key'
-process.env.GOOGLE_CSE_ID = 'test-cse-id'
+﻿process.env.OPENROUTER_API_KEY = 'test'
+process.env.SERPAPI_KEY = 'test-serpapi-key'
 
 jest.mock('../../src/lib/openrouter')
 
@@ -11,11 +10,11 @@ const mockCallLLM = openrouter.callLLM as jest.MockedFunction<typeof openrouter.
 
 describe('generateTags', () => {
   it('parses comma-separated tags', async () => {
-    mockCallLLM.mockResolvedValueOnce('Zeus, mitologia, deuses gregos, Olimpo, trovões, poder, história, lenda, Grécia, titãs')
+    mockCallLLM.mockResolvedValueOnce('Zeus, mitologia, deuses gregos, Olimpo, trovÃµes, poder, histÃ³ria, lenda, GrÃ©cia, titÃ£s')
     const tags = await generateTags('Zeus governava o mundo.')
     expect(tags).toHaveLength(10)
     expect(tags[0]).toBe('Zeus')
-    expect(tags[9]).toBe('titãs')
+    expect(tags[9]).toBe('titÃ£s')
   })
 
   it('trims whitespace from each tag', async () => {

@@ -1,10 +1,9 @@
-import fs from 'fs'
+﻿import fs from 'fs'
 import path from 'path'
 import { prepareStorageDirs } from '../../src/startup'
 
 process.env.OPENROUTER_API_KEY = 'test'
-process.env.GOOGLE_API_KEY = 'test-google-key'
-process.env.GOOGLE_CSE_ID = 'test-cse-id'
+process.env.SERPAPI_KEY = 'test-serpapi-key'
 
 const TMP = path.join(__dirname, 'tmp_startup_test')
 process.env.STORAGE_PATH = TMP
@@ -18,7 +17,7 @@ describe('prepareStorageDirs', () => {
     expect(fs.existsSync(path.join(TMP, 'temp'))).toBe(true)
   })
 
-  it('is idempotent — does not throw if dirs already exist', () => {
+  it('is idempotent â€” does not throw if dirs already exist', () => {
     expect(() => prepareStorageDirs(TMP)).not.toThrow()
   })
 })

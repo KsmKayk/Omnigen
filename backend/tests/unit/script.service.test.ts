@@ -1,6 +1,5 @@
-process.env.OPENROUTER_API_KEY = 'test'
-process.env.GOOGLE_API_KEY = 'test-google-key'
-process.env.GOOGLE_CSE_ID = 'test-cse-id'
+﻿process.env.OPENROUTER_API_KEY = 'test'
+process.env.SERPAPI_KEY = 'test-serpapi-key'
 process.env.NODE_ENV = 'test'
 
 jest.mock('../../src/lib/openrouter')
@@ -14,10 +13,10 @@ const SAMPLE_SCRIPT = `[CENA 1] Zeus no Monte Olimpo
 Na origem dos tempos, Zeus governava o mundo com pulso firme.
 
 [CENA 2] A tempestade
-Seus trovões ecoavam por toda a Terra, proclamando seu domínio.
+Seus trovÃµes ecoavam por toda a Terra, proclamando seu domÃ­nio.
 
 [CENA 3] Os mortais
-Os humanos tremiam e ofereciam sacrifícios ao rei dos deuses.`
+Os humanos tremiam e ofereciam sacrifÃ­cios ao rei dos deuses.`
 
 describe('generateScript', () => {
   beforeEach(() => {
@@ -26,7 +25,7 @@ describe('generateScript', () => {
 
   it('parses scene blocks from LLM output', async () => {
     mockCallLLM.mockResolvedValueOnce(SAMPLE_SCRIPT)
-    const scenes = await generateScript('Zeus', 'short', 'Zeus: O Senhor dos Trovões')
+    const scenes = await generateScript('Zeus', 'short', 'Zeus: O Senhor dos TrovÃµes')
     expect(scenes).toHaveLength(3)
     expect(scenes[0].sceneId).toBe(1)
     expect(scenes[0].description).toBe('Zeus no Monte Olimpo')
@@ -37,14 +36,14 @@ describe('generateScript', () => {
 
   it('uses short_template.txt for short videos (prompt contains 45)', async () => {
     mockCallLLM.mockResolvedValueOnce(SAMPLE_SCRIPT)
-    await generateScript('Zeus', 'short', 'Título')
+    await generateScript('Zeus', 'short', 'TÃ­tulo')
     const prompt = mockCallLLM.mock.calls[0][0]
     expect(prompt).toContain('45')
   })
 
   it('uses long_template.txt for long videos (prompt contains 10)', async () => {
     mockCallLLM.mockResolvedValueOnce(SAMPLE_SCRIPT)
-    await generateScript('Zeus', 'long', 'Título')
+    await generateScript('Zeus', 'long', 'TÃ­tulo')
     const prompt = mockCallLLM.mock.calls[0][0]
     expect(prompt).toContain('10')
   })

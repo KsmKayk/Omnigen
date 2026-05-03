@@ -1,6 +1,5 @@
-process.env.OPENROUTER_API_KEY = 'test'
-process.env.GOOGLE_API_KEY = 'test-google-key'
-process.env.GOOGLE_CSE_ID = 'test-cse-id'
+﻿process.env.OPENROUTER_API_KEY = 'test'
+process.env.SERPAPI_KEY = 'test-serpapi-key'
 process.env.NODE_ENV = 'test'
 
 jest.mock('../../src/lib/openrouter')
@@ -16,23 +15,23 @@ describe('generateTitles', () => {
   })
   it('returns exactly 3 titles from LLM response', async () => {
     mockCallLLM.mockResolvedValueOnce(
-      'A Queda dos Deuses\nZeus: O Senhor dos Trovões\nO Mito da Criação'
+      'A Queda dos Deuses\nZeus: O Senhor dos TrovÃµes\nO Mito da CriaÃ§Ã£o'
     )
     const titles = await generateTitles('Zeus', 'short')
     expect(titles).toHaveLength(3)
     expect(titles[0]).toBe('A Queda dos Deuses')
-    expect(titles[2]).toBe('O Mito da Criação')
+    expect(titles[2]).toBe('O Mito da CriaÃ§Ã£o')
   })
 
   it('trims whitespace from each title', async () => {
-    mockCallLLM.mockResolvedValueOnce('  Título Um  \n  Título Dois  \n  Título Três  ')
+    mockCallLLM.mockResolvedValueOnce('  TÃ­tulo Um  \n  TÃ­tulo Dois  \n  TÃ­tulo TrÃªs  ')
     const titles = await generateTitles('teste', 'long')
-    expect(titles[0]).toBe('Título Um')
-    expect(titles[1]).toBe('Título Dois')
+    expect(titles[0]).toBe('TÃ­tulo Um')
+    expect(titles[1]).toBe('TÃ­tulo Dois')
   })
 
   it('throws if LLM returns fewer than 3 non-empty lines', async () => {
-    mockCallLLM.mockResolvedValueOnce('Apenas um título')
+    mockCallLLM.mockResolvedValueOnce('Apenas um tÃ­tulo')
     await expect(generateTitles('teste', 'short')).rejects.toThrow('Expected 3 titles')
   })
 

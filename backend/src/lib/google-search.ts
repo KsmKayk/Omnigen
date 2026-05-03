@@ -2,36 +2,45 @@ import https from 'https'
 import { config } from '../config'
 import type { AssetSearchResult } from '../types'
 
-interface CseItem {
-  link: string
-  image?: { width: number; height: number }
+interface SerpImageResult {
+  original?: string
+  original_width?: number
+  original_height?: number
 }
 
-interface CseResponse {
-  items?: CseItem[]
+interface SerpOrganicResult {
+  link?: string
 }
 
-interface CseErrorResponse {
-  error?: { code?: number; message?: string }
+interface SerpResponse {
+  images_results?: SerpImageResult[]
+  organic_results?: SerpOrganicResult[]
+  error?: string
 }
 
-function cseFetch(url: string): Promise<CseResponse> {
+function serpFetch(params: Record<string, string>): Promise<SerpResponse> {
+  const qs = new URLSearchParams({ ...params, api_key: config.SERPAPI_KEY }).toString()
+  const url = `https://serpapi.com/search.json?${qs}`
+
   return new Promise((resolve, reject) => {
     const req = https.get(url, (res) => {
       let data = ''
       res.on('data', (chunk) => (data += chunk))
       res.on('end', () => {
-        let parsed: CseResponse & CseErrorResponse
+        let parsed: SerpResponse
         try {
-          parsed = JSON.parse(data) as CseResponse & CseErrorResponse
+          parsed = JSON.parse(data) as SerpResponse
         } catch (e) {
-          reject(new Error(`Failed to parse Google CSE response: ${e}`))
+          reject(new Error(`Failed to parse SerpAPI response: ${e}`))
+          return
+        }
+        if (parsed.error) {
+          reject(new Error(`SerpAPI error: ${parsed.error}`))
           return
         }
         const status = res.statusCode ?? 0
         if (status >= 400) {
-          const msg = parsed.error?.message ?? `HTTP ${status}`
-          reject(new Error(`Google CSE error ${parsed.error?.code ?? status}: ${msg}`))
+          reject(new Error(`SerpAPI HTTP ${status}`))
           return
         }
         resolve(parsed)
@@ -42,38 +51,34 @@ function cseFetch(url: string): Promise<CseResponse> {
 }
 
 export async function googleImageSearch(query: string, count: number): Promise<AssetSearchResult[]> {
-  const params = new URLSearchParams({
-    key: config.GOOGLE_API_KEY,
-    cx: config.GOOGLE_CSE_ID,
+  const data = await serpFetch({
+    engine: 'google_images',
     q: query,
-    searchType: 'image',
     num: String(Math.min(count, 10)),
-    imgSize: 'large',
   })
 
-  const data = await cseFetch(`https://www.googleapis.com/customsearch/v1?${params}`)
-
-  return (data.items ?? []).map((item) => ({
-    url: item.link,
-    width: item.image?.width ?? 1920,
-    height: item.image?.height ?? 1080,
-  }))
+  return (data.images_results ?? [])
+    .filter((item) => !!item.original)
+    .slice(0, count)
+    .map((item) => ({
+      url: item.original!,
+      width: item.original_width ?? 1920,
+      height: item.original_height ?? 1080,
+    }))
 }
 
 export async function googleVideoSearch(query: string, count: number): Promise<AssetSearchResult[]> {
-  const params = new URLSearchParams({
-    key: config.GOOGLE_API_KEY,
-    cx: config.GOOGLE_CSE_ID,
+  const data = await serpFetch({
+    engine: 'google',
     q: `${query} filetype:mp4 -site:youtube.com -site:vimeo.com -site:dailymotion.com`,
     num: String(Math.min(count, 10)),
   })
 
-  const data = await cseFetch(`https://www.googleapis.com/customsearch/v1?${params}`)
-
-  return (data.items ?? [])
-    .filter((item) => /\.mp4(\?|$)/i.test(item.link))
+  return (data.organic_results ?? [])
+    .filter((item) => !!item.link && /\.mp4(\?|$)/i.test(item.link))
+    .slice(0, count)
     .map((item) => ({
-      url: item.link,
+      url: item.link!,
       width: 1920,
       height: 1080,
     }))

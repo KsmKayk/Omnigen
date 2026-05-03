@@ -1,10 +1,9 @@
-import { getAudioDurationMs, buildConcatFile } from '../../src/lib/ffmpeg'
+﻿import { getAudioDurationMs, buildConcatFile } from '../../src/lib/ffmpeg'
 import * as childProcess from 'child_process'
 
 jest.mock('child_process')
 process.env.OPENROUTER_API_KEY = 'test'
-process.env.GOOGLE_API_KEY = 'test-google-key'
-process.env.GOOGLE_CSE_ID = 'test-cse-id'
+process.env.SERPAPI_KEY = 'test-serpapi-key'
 
 const mockExecFile = childProcess.execFile as jest.MockedFunction<typeof childProcess.execFile>
 

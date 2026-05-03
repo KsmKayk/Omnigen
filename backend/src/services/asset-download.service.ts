@@ -37,12 +37,15 @@ export async function downloadWithFallback(
   candidates: AssetSearchResult[],
   destPath: string,
 ): Promise<AssetSearchResult | null> {
-  for (const candidate of candidates) {
+  for (let i = 0; i < candidates.length; i++) {
+    const candidate = candidates[i]
+    const tmpPath = `${destPath}.tmp${i}`
     try {
-      await downloadAsset(candidate.url, destPath)
+      await downloadAsset(candidate.url, tmpPath)
+      fs.renameSync(tmpPath, destPath)
       return candidate
     } catch {
-      // try next candidate
+      try { fs.unlinkSync(tmpPath) } catch { /* already gone */ }
     }
   }
   return null

@@ -1,6 +1,5 @@
-process.env.OPENROUTER_API_KEY = 'test'
-process.env.GOOGLE_API_KEY = 'test-google-key'
-process.env.GOOGLE_CSE_ID = 'test-cse-id'
+﻿process.env.OPENROUTER_API_KEY = 'test'
+process.env.SERPAPI_KEY = 'test-serpapi-key'
 process.env.NODE_ENV = 'test'
 
 import { runPipeline } from '../../src/services/pipeline.service'
@@ -49,7 +48,7 @@ const MOCK_ASSETS: AssetRecord[] = [
 ;(renderSvc.renderVideo as jest.Mock).mockResolvedValue('/tmp/video.mp4')
 ;(thumbnailSvc.generateThumbnails as jest.Mock).mockResolvedValue(['/tmp/thumb1.jpg', '/tmp/thumb2.jpg', '/tmp/thumb3.jpg'])
 ;(tagsSvc.generateTags as jest.Mock).mockResolvedValue(['Zeus', 'mitologia'])
-;(descSvc.generateDescription as jest.Mock).mockResolvedValue('Descrição do vídeo.')
+;(descSvc.generateDescription as jest.Mock).mockResolvedValue('DescriÃ§Ã£o do vÃ­deo.')
 
 describe('runPipeline', () => {
   it('emits progress events in order and returns result', async () => {
@@ -85,7 +84,7 @@ describe('runPipeline', () => {
         generationId: 'gen2',
         theme: 'Zeus',
         videoType: 'short',
-        selectedTitle: 'Título',
+        selectedTitle: 'TÃ­tulo',
         storagePath: '/tmp',
         emit: (e) => events.push(e),
       })
