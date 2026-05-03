@@ -3,7 +3,8 @@ import * as childProcess from 'child_process'
 
 jest.mock('child_process')
 process.env.OPENROUTER_API_KEY = 'test'
-process.env.PEXELS_API_KEY = 'test'
+process.env.GOOGLE_API_KEY = 'test-google-key'
+process.env.GOOGLE_CSE_ID = 'test-cse-id'
 
 const mockExecFile = childProcess.execFile as jest.MockedFunction<typeof childProcess.execFile>
 

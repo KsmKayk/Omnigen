@@ -4,7 +4,8 @@ import { generateThumbnails } from '../../src/services/thumbnail.service'
 jest.mock('../../src/lib/ffmpeg')
 jest.mock('../../src/services/asset-download.service')
 process.env.OPENROUTER_API_KEY = 'test'
-process.env.PEXELS_API_KEY = 'test'
+process.env.GOOGLE_API_KEY = 'test-google-key'
+process.env.GOOGLE_CSE_ID = 'test-cse-id'
 
 const mockGetAudioDurationMs = ffmpegLib.getAudioDurationMs as jest.MockedFunction<
   typeof ffmpegLib.getAudioDurationMs

@@ -3,7 +3,8 @@ import path from 'path'
 describe('config', () => {
   const REQUIRED_VARS = {
     OPENROUTER_API_KEY: 'test-key',
-    PEXELS_API_KEY: 'test-pexels',
+    GOOGLE_API_KEY: 'test-google-key',
+    GOOGLE_CSE_ID: 'test-cse-id',
   }
 
   beforeEach(() => {
@@ -14,7 +15,8 @@ describe('config', () => {
   afterEach(() => {
     // Clean up
     delete process.env.OPENROUTER_API_KEY
-    delete process.env.PEXELS_API_KEY
+    delete process.env.GOOGLE_API_KEY
+    delete process.env.GOOGLE_CSE_ID
     delete process.env.PORT
     jest.resetModules()
   })
@@ -25,10 +27,20 @@ describe('config', () => {
     expect(() => require('../../src/config')).toThrow('Invalid environment variables')
   })
 
-  it('throws on missing PEXELS_API_KEY', () => {
-    delete process.env.PEXELS_API_KEY
+  it('throws when GOOGLE_API_KEY is missing', () => {
     jest.resetModules()
+    const saved = process.env.GOOGLE_API_KEY
+    delete process.env.GOOGLE_API_KEY
     expect(() => require('../../src/config')).toThrow('Invalid environment variables')
+    process.env.GOOGLE_API_KEY = saved ?? 'test'
+  })
+
+  it('throws when GOOGLE_CSE_ID is missing', () => {
+    jest.resetModules()
+    const saved = process.env.GOOGLE_CSE_ID
+    delete process.env.GOOGLE_CSE_ID
+    expect(() => require('../../src/config')).toThrow('Invalid environment variables')
+    process.env.GOOGLE_CSE_ID = saved ?? 'test'
   })
 
   it('parses PORT as number', () => {

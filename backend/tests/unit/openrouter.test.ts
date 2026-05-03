@@ -1,5 +1,6 @@
 process.env.OPENROUTER_API_KEY = 'test-key'
-process.env.PEXELS_API_KEY = 'test-key'
+process.env.GOOGLE_API_KEY = 'test-google-key'
+process.env.GOOGLE_CSE_ID = 'test-cse-id'
 process.env.NODE_ENV = 'test'
 
 import nock from 'nock'

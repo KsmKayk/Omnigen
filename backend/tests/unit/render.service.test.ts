@@ -1,5 +1,6 @@
 process.env.OPENROUTER_API_KEY = 'test'
-process.env.PEXELS_API_KEY = 'test'
+process.env.GOOGLE_API_KEY = 'test-google-key'
+process.env.GOOGLE_CSE_ID = 'test-cse-id'
 
 jest.mock('../../src/lib/ffmpeg')
 jest.mock('fluent-ffmpeg', () => {

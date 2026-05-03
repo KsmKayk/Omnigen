@@ -12,7 +12,8 @@ const schema = z.object({
   PIPER_MODEL_PATH: z.string().default('pt_BR-faber-medium'),
   FFMPEG_PATH: z.string().default('ffmpeg'),
 
-  PEXELS_API_KEY: z.string().min(1),
+  GOOGLE_API_KEY: z.string().min(1),
+  GOOGLE_CSE_ID: z.string().min(1),
 
   DATABASE_URL: z.string().default('./storage/omnigen.db'),
   STORAGE_PATH: z.string().default('./storage'),

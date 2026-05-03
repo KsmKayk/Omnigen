@@ -4,7 +4,8 @@ import { generateSubtitles, formatSRTTime } from '../../src/services/subtitle.se
 import type { SceneBlock } from '../../src/types'
 
 process.env.OPENROUTER_API_KEY = 'test'
-process.env.PEXELS_API_KEY = 'test'
+process.env.GOOGLE_API_KEY = 'test-google-key'
+process.env.GOOGLE_CSE_ID = 'test-cse-id'
 
 const TMP = path.join(__dirname, 'tmp_subtitle_test')
 
