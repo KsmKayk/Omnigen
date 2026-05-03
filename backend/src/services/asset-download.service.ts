@@ -2,6 +2,7 @@ import fs from 'fs'
 import https from 'https'
 import http from 'http'
 import path from 'path'
+import type { AssetSearchResult } from '../types'
 
 export function ensureDir(dirPath: string): void {
   fs.mkdirSync(dirPath, { recursive: true })
@@ -30,4 +31,19 @@ export function downloadAsset(url: string, destPath: string): Promise<void> {
       reject(err)
     })
   })
+}
+
+export async function downloadWithFallback(
+  candidates: AssetSearchResult[],
+  destPath: string,
+): Promise<AssetSearchResult | null> {
+  for (const candidate of candidates) {
+    try {
+      await downloadAsset(candidate.url, destPath)
+      return candidate
+    } catch {
+      // try next candidate
+    }
+  }
+  return null
 }
