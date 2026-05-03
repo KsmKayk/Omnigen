@@ -86,29 +86,46 @@ export async function downloadVideoSegment(url: string, destPath: string, maxSec
     return
   }
 
-  // Platform URL (YouTube, Vimeo, etc.) — use yt-dlp to download just the segment
+  // Platform URL (YouTube, Vimeo, etc.) — yt-dlp only; ffmpeg cannot fetch these URLs
+  // Attempt 1: download only the required section (faster, smaller file)
   try {
     await execFileAsync('yt-dlp', [
       '--download-sections', `*0:00-${maxSeconds}`,
       '--no-playlist',
-      '-f', 'bestvideo[height>=720][height<=1080]+bestaudio/best[height>=720]/best',
+      '-f', 'bestvideo[height<=1080]+bestaudio/best',
       '--merge-output-format', 'mp4',
       '--no-warnings',
       '-o', destPath,
       url,
     ])
-    // yt-dlp appends .mp4 when destPath has no .mp4 extension (e.g. tmpPath = scene.mp4.tmp0 → scene.mp4.tmp0.mp4)
     const ytdlpOut = `${destPath}.mp4`
     if (!fs.existsSync(destPath) && fs.existsSync(ytdlpOut)) {
       fs.renameSync(ytdlpOut, destPath)
     }
     return
-  } catch (err) {
-    console.warn(`[video] yt-dlp failed for ${url}: ${(err as Error).message?.slice(0, 300)}`)
+  } catch {
     try { fs.unlinkSync(`${destPath}.mp4`) } catch { /* already gone */ }
   }
 
-  await execFileAsync(ffmpegPath, ['-i', url, '-t', String(maxSeconds), '-c', 'copy', '-y', destPath])
+  // Attempt 2: --download-sections failed; full download then trim
+  // (some formats/platforms don't support partial seeking)
+  const tmpFull = `${destPath}.fulldl`
+  try {
+    await execFileAsync('yt-dlp', [
+      '--no-playlist',
+      '-f', 'bestvideo[height<=1080]+bestaudio/best',
+      '--merge-output-format', 'mp4',
+      '--no-warnings',
+      '-o', tmpFull,
+      url,
+    ])
+    const actualFull = fs.existsSync(tmpFull) ? tmpFull : `${tmpFull}.mp4`
+    if (!fs.existsSync(actualFull)) throw new Error(`yt-dlp produced no output for ${url}`)
+    await execFileAsync(ffmpegPath, ['-i', actualFull, '-t', String(maxSeconds), '-c', 'copy', '-y', destPath])
+  } finally {
+    try { fs.unlinkSync(tmpFull) } catch { }
+    try { fs.unlinkSync(`${tmpFull}.mp4`) } catch { }
+  }
 }
 
 export async function downloadWithFallback(
