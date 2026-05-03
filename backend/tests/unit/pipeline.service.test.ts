@@ -1,6 +1,7 @@
 process.env.OPENROUTER_API_KEY = 'test'
 process.env.GOOGLE_API_KEY = 'test-google-key'
 process.env.GOOGLE_CSE_ID = 'test-cse-id'
+process.env.NODE_ENV = 'test'
 
 import { runPipeline } from '../../src/services/pipeline.service'
 import * as scriptSvc from '../../src/services/script.service'
@@ -33,9 +34,15 @@ const MOCK_ASSETS: AssetRecord[] = [
 ]
 
 ;(scriptSvc.generateScript as jest.Mock).mockResolvedValue(MOCK_SCENES)
-;(assetSearchSvc.searchImages as jest.Mock).mockResolvedValue({ url: 'https://example.com/1.jpg', width: 1080, height: 1920 })
-;(assetSearchSvc.searchVideos as jest.Mock).mockResolvedValue(null)
-;(assetDownloadSvc.downloadAsset as jest.Mock).mockResolvedValue(undefined)
+;(assetSearchSvc.searchImages as jest.Mock).mockResolvedValue([
+  { url: 'https://example.com/1.jpg', width: 1080, height: 1920 },
+])
+;(assetSearchSvc.searchVideos as jest.Mock).mockResolvedValue([])
+;(assetDownloadSvc.downloadWithFallback as jest.Mock).mockResolvedValue({
+  url: 'https://example.com/1.jpg',
+  width: 1080,
+  height: 1920,
+})
 ;(assetDownloadSvc.ensureDir as jest.Mock).mockReturnValue(undefined)
 ;(ttsSvc.synthesizeSpeech as jest.Mock).mockResolvedValue({ audioPath: '/tmp/narration.wav', durations: [3000] })
 ;(subtitleSvc.generateSubtitles as jest.Mock).mockResolvedValue('/tmp/subtitles.srt')
