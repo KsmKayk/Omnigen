@@ -36,8 +36,27 @@ export async function renderVideo(opts: RenderOptions): Promise<string> {
   const { width, height } = RESOLUTIONS[videoType]
   const durationPerScene = Math.floor(audioMs / scenes.length)
 
-  const imagePaths = assets.map((a) => a.localPath)
-  const concatContent = buildConcatFile(imagePaths, durationPerScene)
+  // Pre-trim video assets to exact scene duration — concat demuxer ignores
+  // the `duration` hint for video files and plays the full clip otherwise
+  const assetPaths: string[] = []
+  for (const asset of assets) {
+    if (asset.type === 'video') {
+      const trimmedPath = path.join(tempDir, `scene_${asset.sceneId}_trim.mp4`)
+      await new Promise<void>((resolve, reject) => {
+        ffmpeg(asset.localPath)
+          .outputOptions(['-t', String(durationPerScene / 1000), '-c', 'copy', '-y'])
+          .output(trimmedPath)
+          .on('end', () => resolve())
+          .on('error', reject)
+          .run()
+      })
+      assetPaths.push(trimmedPath)
+    } else {
+      assetPaths.push(asset.localPath)
+    }
+  }
+
+  const concatContent = buildConcatFile(assetPaths, durationPerScene)
   const concatPath = path.join(tempDir, 'concat.txt')
   fs.writeFileSync(concatPath, concatContent, 'utf-8')
 

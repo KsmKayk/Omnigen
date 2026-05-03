@@ -34,12 +34,19 @@ const MOCK_ASSETS: AssetRecord[] = [
   { sceneId: 2, type: 'image', url: 'https://example.com/2.jpg', localPath: '/tmp/scene_2.jpg', width: 1080, height: 1920 },
 ]
 
+const MOCK_ASSETS_WITH_VIDEO: AssetRecord[] = [
+  { sceneId: 1, type: 'video', url: 'https://youtube.com/v=abc', localPath: '/tmp/scene_1.mp4', width: 1920, height: 1080 },
+  { sceneId: 2, type: 'image', url: 'https://example.com/2.jpg', localPath: '/tmp/scene_2.jpg', width: 1080, height: 1920 },
+]
+
 const MOCK_SCENES: SceneBlock[] = [
   { sceneId: 1, description: 'Abertura', narration: 'Texto da cena um.' },
   { sceneId: 2, description: 'Cena dois', narration: 'Texto da cena dois.' },
 ]
 
 describe('renderVideo', () => {
+  beforeEach(() => jest.clearAllMocks())
+
   it('calls getAudioDurationMs and returns output path', async () => {
     mockGetAudioDurationMs.mockResolvedValueOnce(50000)
     mockBuildConcatFile.mockReturnValueOnce("file '/tmp/scene_1.jpg'\nduration 25")
@@ -60,6 +67,26 @@ describe('renderVideo', () => {
       25000, // floor(50000 / 2)
     )
     expect(result).toContain('video.mp4')
+  })
+
+  it('pre-trims video assets and passes trimmed path to buildConcatFile', async () => {
+    mockGetAudioDurationMs.mockResolvedValueOnce(50000)
+    mockBuildConcatFile.mockReturnValueOnce('')
+
+    await renderVideo({
+      generationId: 'gen3',
+      storagePath: '/tmp',
+      assets: MOCK_ASSETS_WITH_VIDEO,
+      scenes: MOCK_SCENES,
+      ttsPath: '/tmp/narration.wav',
+      subtitlePath: '/tmp/subtitles.srt',
+      videoType: 'short',
+    })
+
+    const [paths, duration] = mockBuildConcatFile.mock.calls[0]
+    expect(paths[0]).toContain('scene_1_trim.mp4') // video → trimmed path
+    expect(paths[1]).toBe('/tmp/scene_2.jpg')       // image → original path
+    expect(duration).toBe(25000)
   })
 
   it('throws when assets and scenes have different lengths', async () => {
