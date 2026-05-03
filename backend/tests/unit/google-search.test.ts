@@ -60,31 +60,44 @@ describe('googleImageSearch', () => {
 describe('googleVideoSearch', () => {
   afterEach(() => nock.cleanAll())
 
-  it('returns only direct mp4 links', async () => {
+  it('returns video candidates from video_results', async () => {
     nock(BASE)
       .get('/search.json')
       .query(true)
       .reply(200, {
-        organic_results: [
-          { link: 'https://cdn.example.com/video.mp4' },
-          { link: 'https://www.youtube.com/watch?v=abc' },
-          { link: 'https://cdn.example.com/clip.MP4?token=xyz' },
+        video_results: [
+          { link: 'https://www.youtube.com/watch?v=abc', title: 'Storm video' },
+          { link: 'https://vimeo.com/123456', title: 'Lightning clip' },
         ],
       })
 
     const results = await googleVideoSearch('storm', 5)
     expect(results).toHaveLength(2)
-    expect(results[0].url).toBe('https://cdn.example.com/video.mp4')
-    expect(results[1].url).toBe('https://cdn.example.com/clip.MP4?token=xyz')
+    expect(results[0].url).toBe('https://www.youtube.com/watch?v=abc')
+    expect(results[1].url).toBe('https://vimeo.com/123456')
+    expect(results[0].width).toBe(1920)
+    expect(results[0].height).toBe(1080)
   })
 
-  it('returns empty array when no mp4 links found', async () => {
+  it('returns empty array when video_results is absent', async () => {
+    nock(BASE).get('/search.json').query(true).reply(200, {})
+    const results = await googleVideoSearch('test', 5)
+    expect(results).toEqual([])
+  })
+
+  it('filters out entries without a link', async () => {
     nock(BASE)
       .get('/search.json')
       .query(true)
-      .reply(200, { organic_results: [{ link: 'https://youtube.com/watch?v=x' }] })
+      .reply(200, {
+        video_results: [
+          { title: 'No link entry' },
+          { link: 'https://www.youtube.com/watch?v=xyz' },
+        ],
+      })
 
     const results = await googleVideoSearch('test', 5)
-    expect(results).toEqual([])
+    expect(results).toHaveLength(1)
+    expect(results[0].url).toBe('https://www.youtube.com/watch?v=xyz')
   })
 })

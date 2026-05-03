@@ -32,6 +32,27 @@ describe('downloadAsset', () => {
       downloadAsset('https://files.pexels.com/missing.jpg', path.join(TMP, 'x.jpg'))
     ).rejects.toThrow('HTTP 404')
   })
+
+  it('follows HTTP redirects', async () => {
+    nock('https://redirect.example.com')
+      .get('/image.jpg')
+      .reply(301, '', { Location: 'https://cdn.example.com/final.jpg' })
+    nock('https://cdn.example.com')
+      .get('/final.jpg')
+      .reply(200, Buffer.from('redirected-image'))
+
+    const dest = path.join(TMP, 'redirected.jpg')
+    await downloadAsset('https://redirect.example.com/image.jpg', dest)
+    expect(fs.existsSync(dest)).toBe(true)
+    expect(fs.readFileSync(dest).toString()).toBe('redirected-image')
+  })
+
+  it('throws on empty response body', async () => {
+    nock('https://files.pexels.com').get('/empty.jpg').reply(200, Buffer.alloc(0))
+    await expect(
+      downloadAsset('https://files.pexels.com/empty.jpg', path.join(TMP, 'empty.jpg'))
+    ).rejects.toThrow('Empty response body')
+  })
 })
 
 describe('ensureDir', () => {

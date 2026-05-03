@@ -1,7 +1,7 @@
 import path from 'path'
 import { generateScript } from './script.service'
 import { searchImages, searchVideos } from './asset-search.service'
-import { downloadWithFallback, ensureDir } from './asset-download.service'
+import { downloadWithFallback, downloadVideoWithFallback, ensureDir } from './asset-download.service'
 import { synthesizeSpeech } from './tts.service'
 import { generateSubtitles } from './subtitle.service'
 import { renderVideo } from './render.service'
@@ -74,7 +74,7 @@ export async function runPipeline(input: PipelineInput): Promise<GenerationResul
       const imageCandidates = assetSearchResults[i]
 
       const videoDestPath = path.join(assetsDir, `scene_${scene.sceneId}.mp4`)
-      const downloadedVideo = await downloadWithFallback(videoCandidates, videoDestPath)
+      const downloadedVideo = await downloadVideoWithFallback(videoCandidates, videoDestPath, 30)
       if (downloadedVideo) {
         records.push({
           sceneId: scene.sceneId,

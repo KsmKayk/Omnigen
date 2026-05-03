@@ -12,9 +12,15 @@ interface SerpOrganicResult {
   link?: string
 }
 
+interface SerpVideoResult {
+  link?: string
+  title?: string
+}
+
 interface SerpResponse {
   images_results?: SerpImageResult[]
   organic_results?: SerpOrganicResult[]
+  video_results?: SerpVideoResult[]
   error?: string
 }
 
@@ -66,13 +72,13 @@ export async function googleImageSearch(query: string, count: number): Promise<A
 
 export async function googleVideoSearch(query: string, count: number): Promise<AssetSearchResult[]> {
   const data = await serpFetch({
-    engine: 'google',
-    q: `${query} filetype:mp4 -site:youtube.com -site:vimeo.com -site:dailymotion.com`,
+    engine: 'google_videos',
+    q: query,
     num: String(Math.min(count, 10)),
   })
 
-  return (data.organic_results ?? [])
-    .filter((item) => !!item.link && /\.mp4(\?|$)/i.test(item.link))
+  return (data.video_results ?? [])
+    .filter((item) => !!item.link)
     .slice(0, count)
     .map((item) => ({
       url: item.link!,

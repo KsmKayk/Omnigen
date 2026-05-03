@@ -37,6 +37,7 @@ const MOCK_ASSETS: AssetRecord[] = [
   { url: 'https://example.com/1.jpg', width: 1080, height: 1920 },
 ])
 ;(assetSearchSvc.searchVideos as jest.Mock).mockResolvedValue([])
+;(assetDownloadSvc.downloadVideoWithFallback as jest.Mock).mockResolvedValue(null)
 ;(assetDownloadSvc.downloadWithFallback as jest.Mock).mockResolvedValue({
   url: 'https://example.com/1.jpg',
   width: 1080,
