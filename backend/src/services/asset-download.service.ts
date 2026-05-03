@@ -78,9 +78,11 @@ export function downloadAsset(url: string, destPath: string, redirectCount = 0):
 }
 
 export async function downloadVideoSegment(url: string, destPath: string, maxSeconds = 30): Promise<void> {
+  const ffmpegPath = getFfmpegPath()
+
   // Direct .mp4 URL — stream only the needed seconds via ffmpeg
   if (/\.mp4(\?|$)/i.test(url)) {
-    await execFileAsync(getFfmpegPath(), ['-i', url, '-t', String(maxSeconds), '-c', 'copy', '-y', destPath])
+    await execFileAsync(ffmpegPath, ['-i', url, '-t', String(maxSeconds), '-c', 'copy', '-y', destPath])
     return
   }
 
@@ -89,18 +91,24 @@ export async function downloadVideoSegment(url: string, destPath: string, maxSec
     await execFileAsync('yt-dlp', [
       '--download-sections', `*0:00-${maxSeconds}`,
       '--no-playlist',
-      '-f', 'bestvideo[ext=mp4][height<=1080]+bestaudio/best[ext=mp4]/best',
+      '-f', 'bestvideo[height<=1080]+bestaudio/best',
       '--merge-output-format', 'mp4',
       '--no-warnings',
       '-o', destPath,
       url,
     ])
+    // yt-dlp appends .mp4 when destPath has no .mp4 extension (e.g. tmpPath = scene.mp4.tmp0 → scene.mp4.tmp0.mp4)
+    const ytdlpOut = `${destPath}.mp4`
+    if (!fs.existsSync(destPath) && fs.existsSync(ytdlpOut)) {
+      fs.renameSync(ytdlpOut, destPath)
+    }
     return
-  } catch {
-    // yt-dlp not installed or failed — try ffmpeg as last resort
+  } catch (err) {
+    console.warn(`[video] yt-dlp failed for ${url}: ${(err as Error).message?.slice(0, 300)}`)
+    try { fs.unlinkSync(`${destPath}.mp4`) } catch { /* already gone */ }
   }
 
-  await execFileAsync(getFfmpegPath(), ['-i', url, '-t', String(maxSeconds), '-c', 'copy', '-y', destPath])
+  await execFileAsync(ffmpegPath, ['-i', url, '-t', String(maxSeconds), '-c', 'copy', '-y', destPath])
 }
 
 export async function downloadWithFallback(

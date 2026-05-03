@@ -34,11 +34,11 @@ describe('generateScript', () => {
     )
   })
 
-  it('uses short_template.txt for short videos (prompt contains 45)', async () => {
+  it('uses short_template.txt for short videos (prompt contains 55)', async () => {
     mockCallLLM.mockResolvedValueOnce(SAMPLE_SCRIPT)
     await generateScript('Zeus', 'short', 'TÃ­tulo')
     const prompt = mockCallLLM.mock.calls[0][0]
-    expect(prompt).toContain('45')
+    expect(prompt).toContain('55')
   })
 
   it('uses long_template.txt for long videos (prompt contains 10)', async () => {

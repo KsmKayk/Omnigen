@@ -1,13 +1,18 @@
-Crie um roteiro para um vídeo curto (45 a 60 segundos) sobre: {{title}}.
+Crie um roteiro para um vídeo curto (55 a 60 segundos) sobre: {{title}}.
 
 O tema principal é: {{theme}}.
 
 O roteiro deve:
-- Ter duração aproximada de 45-60 segundos quando narrado
+- Ter duração aproximada de 55-60 segundos quando narrado
 - Ser dinâmico e prender a atenção desde o início
-- Ter aproximadamente 5 a 8 cenas visuais
+- Utilizar de cortes rapidos para enfatizar mais cenas
+- Pode ter entre 5 a 20 cenas o roteiro completo
 - Ser em português do Brasil
 - Estar formatado com indicações de cena separadas por linhas
+- A narrativa da cena deve ser direta
+
+O roteiro NÃO deve:
+- Não deve vir descrita narrativa: texto
 
 Formato esperado:
 [CENA 1] Descrição da cena
