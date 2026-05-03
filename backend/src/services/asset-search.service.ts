@@ -1,3 +1,5 @@
+import { googleImageSearch, googleVideoSearch } from '../lib/google-search'
+
 export type Orientation = 'portrait' | 'landscape'
 
 export interface AssetSearchResult {
@@ -6,13 +8,15 @@ export interface AssetSearchResult {
   height: number
 }
 
+const CANDIDATES_PER_SCENE = 5
+
 export async function searchImages(
-  _query: string,
-  _orientation: Orientation,
-): Promise<AssetSearchResult | null> {
-  return null
+  query: string,
+  orientation: Orientation,
+): Promise<AssetSearchResult[]> {
+  return googleImageSearch(`${query} ${orientation}`, CANDIDATES_PER_SCENE)
 }
 
-export async function searchVideos(_query: string): Promise<AssetSearchResult | null> {
-  return null
+export async function searchVideos(query: string): Promise<AssetSearchResult[]> {
+  return googleVideoSearch(query, CANDIDATES_PER_SCENE)
 }
